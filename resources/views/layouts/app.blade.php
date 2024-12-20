@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="{{ asset('images/logo_circle.pg') }}" type="image/x-icon">
+  <link rel="icon" href="{{ asset('images/logo_circle.jpg') }}" type="image/x-icon">
   <title>@yield('title', 'Swarna Metals Zambia Limited (SMZL)')</title>
 
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -118,17 +118,18 @@
         }
     }
 
-    /* style for footer  */
+    /* General Styles */
     .main-footer {
-        background-color: #003366; /* Dark blue background */
-        color: white; /* White text color */
+        /* background-color: #003366;  */
+        background-color: #510404;
+        color: white;
         margin-top: 40px;
-        padding: 30px 0; /* Increased padding for better spacing */
+        padding: 10px 0 30px 0; 
         width: 100%;
     }
 
     .main-footer h5 {
-        font-size: 25px;
+        font-size: 1.5rem;
         font-weight: bold;
         margin-bottom: 10px;
         color: #ffffff;
@@ -144,7 +145,7 @@
     }
 
     .footer-link:hover {
-        color: #f1c40f; /* Gold on hover */
+        color: #ff5733; /* Gold on hover */
     }
 
     .main-footer p, .main-footer ul {
@@ -159,23 +160,63 @@
     }
 
     .main-footer .text-center {
-        font-size: 14px;
+        font-size: 0.9rem; /* Slightly smaller text for copyright */
         margin-top: 20px;
-        color: #ffffff; /* Slightly lighter text for copyright */
+        color: #ffffff;
     }
 
     .main-footer i {
-        font-size: 16px; /* Adjust icon size */
+        font-size: 1.1rem; /* Adjust icon size */
         margin-right: 8px; /* Add space between icon and text */
-        color: #ffffff; /* Gold icon color for better visibility */
+        color: #ffffff;
     }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .main-footer h5 {
+            font-size: 1.25rem; /* Adjust heading size */
+            text-align: center;
+        }
+
+        .main-footer .row {
+            text-align: center; /* Center-align text for smaller screens */
+        }
+
+        .main-footer p {
+            font-size: 0.95rem;
+        }
+
+        .main-footer p, .main-footer ul {
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .footer-link {
+            font-size: 0.95rem; /* Adjust link size */
+        }
+    }
+
+    @media (max-width: 576px) {
+        .main-footer h5 {
+            font-size: 1.1rem; /* Further adjust heading size */
+        }
+
+        .main-footer p, .footer-link {
+            font-size: 0.85rem; /* Reduce font size for very small screens */
+        }
+
+        .footer-link i {
+            font-size: 1rem; /* Smaller icon size */
+        }
+    }
+
 
 </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 
   @include('layouts.header')
-{{-- <div class="container mt-5"> --}}
     @if (session('success'))
         <div class="alert alert-success">
             {{ session('success') }}
@@ -183,7 +224,6 @@
     @endif
 
     @yield('content')
-{{-- </div> --}}
 
   @include('layouts.footer')
 

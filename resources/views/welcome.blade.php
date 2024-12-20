@@ -89,6 +89,10 @@
         font-size: 2.5rem;
     }
 
+    .welcome-section p {
+        font-size: 25px;
+    }
+
     @media (max-width: 768px) {
         .hero-section {
             min-height: 60vh;
@@ -103,8 +107,13 @@
         }
 
         .welcome-section h1 {
-            font-size: 2rem;
+            font-size: 23px;
         }
+
+        .welcome-section p {
+            font-size: 17px;
+        }
+
 
         .product-info h5 {
             font-size: 1.25rem;
@@ -126,7 +135,7 @@
     <div class="container animate-float-in">
         <h1 class="display-3 fw-bold">Swarna Metals</h1>
         <p class="lead">Discover our products and services today.</p>
-        <a href="/about" class="btn btn-primary px-4 py-2">Explore</a>
+        <a href="/about" class="btn mb-2 text-white" style="background-color: #510404;">Explore</a>
         <div class="mt-3">
             <p>★★★★★</p>
             <p class="fw-bold">QUALITY, RELIABILITY, INNOVATION, EXCELLENCE</p>
@@ -134,7 +143,7 @@
     </div>
 </section>
 
-<section class="welcome-section py-5 bg-light">
+<section class="welcome-section py-3 bg-light">
     <div class="container animate-float-in">
         <div class="row">
             <div class="col-md-6">
@@ -144,7 +153,7 @@
                     <span class="fw-bold">greenfield hydrometallurgical copper extraction plant</span>,
                     strategically located 25 kilometers from Kitwe, in Zambia's Copperbelt Province.
                 </p>
-                <a href="/about" class="btn btn-primary">Learn More</a>
+                <a href="/about" class="btn mb-2 text-white" style="background-color: #510404;">Learn More</a>
             </div>
             <div class="col-md-6">
                 <img src="{{ asset('images/side-image.jpg') }}" alt="Swarna Plant" class="img-fluid rounded">
@@ -153,36 +162,37 @@
     </div>
 </section>
 
-<section style="background-color: #a8dadc;">
+<section style="background-color: #510404;">
     <div class="images-section py-5">
-        <h1 class="text-center mb-5">Our Products and Services</h1>
+    <div class="images-section py-5">
+        <h1 class="text-center mb-5 text-white">Our Products and Services</h1>
         <div class="container">
             <div class="row text-center g-4">
                 <div class="col-md-4">
                     <img src="{{ asset('images/cathode.jpeg') }}" alt="Copper Cathodes" class="img-fluid gallery-img">
                     <div class="product-info">
-                        <h5>Copper Cathodes</h5>
-                        <p><strong>Description:</strong> High-purity cathodes with 99.99% Cu content, suitable for industrial applications.</p>
-                        <p><strong>Applications:</strong> Electrical manufacturing, construction, and industrial machinery.</p>
-                        <p><strong>Key Features:</strong> Precision-crafted using advanced hydrometallurgical techniques.</p>
+                        <h5 class="text-white">Copper Cathodes</h5>
+                        <p class="text-white"><strong>Description:</strong> High-purity cathodes with 99.99% Cu content, suitable for industrial applications.</p>
+                        <p class="text-white"><strong>Applications:</strong> Electrical manufacturing, construction, and industrial machinery.</p>
+                        <p class="text-white"><strong>Key Features:</strong> Precision-crafted using advanced hydrometallurgical techniques.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <img src="{{ asset('images/1733738279178.png') }}" alt="Copper Concentrates" class="img-fluid gallery-img">
                     <div class="product-info">
-                        <h5>Copper Concentrates</h5>
-                        <p><strong>Description:</strong> Premium-grade concentrates with 25% copper content, ideal for smelting and refining processes.</p>
-                        <p><strong>Applications:</strong> Base material for high-value copper products.</p>
-                        <p><strong>Key Features:</strong> Sustainably sourced from sulphide ores.</p>
+                        <h5 class="text-white">Copper Concentrates</h5>
+                        <p class="text-white"><strong>Description:</strong> Premium-grade concentrates with 25% copper content, ideal for smelting and refining processes.</p>
+                        <p class="text-white"><strong>Applications:</strong> Base material for high-value copper products.</p>
+                        <p class="text-white"><strong>Key Features:</strong> Sustainably sourced from sulphide ores.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <img src="{{ asset('images/IMG-20241209-WA0101.jpg') }}" alt="Future Goals" class="img-fluid gallery-img">
                     <div class="product-info">
-                        <h5>Future Goals</h5>
-                        <p><strong>Expansion:</strong> Expand milling capacity to 2,400 TPD by 2026.</p>
-                        <p><strong>Partnerships:</strong> Establish global partnerships for copper exports.</p>
-                        <p><strong>Contributions:</strong> Contribute significantly to Zambia’s industrial growth through innovation and sustainability.</p>
+                        <h5 class="text-white">Future Goals</h5>
+                        <p class="text-white"><strong>Expansion:</strong> Expand milling capacity to 2,400 TPD by 2026.</p>
+                        <p class="text-white"><strong>Partnerships:</strong> Establish global partnerships for copper exports.</p>
+                        <p class="text-white"><strong>Contributions:</strong> Contribute significantly to Zambia’s industrial growth through innovation and sustainability.</p>
                     </div>
                 </div>
             </div>
@@ -192,8 +202,8 @@
 
 <section class="our-gallery py-5">
     <div class="container">
-        <h2 class="text-center mb-4">Our Gallery</h2>
-        <p class="text-center mb-5">Explore our products and services.</p>
+        <h1 class="text-center mb-3">Our Gallery</h1>
+        {{-- <h2 class="text-center mb-4">Our Gallery</h2> --}}
         <div class="row g-4">
             <div class="col-md-8">
                 <img src="{{ asset('images/swarna-truck.jpeg') }}" alt="Image 1" class="img-fluid gallery-img">

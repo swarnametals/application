@@ -3,23 +3,16 @@
 @section('title', 'Jobs')
 
 @section('content')
-<div class="container">
-    <h1 class="text-center">Careers</h1>
-    <h2>Career Opportunities at Swarna Metals Zambia Limited (Kitwe, Copperbelt)</h2>
-    <h4>Publication Date: 18th November, 2024.</h4>
-    <p>
-        Swarna Metals Zambia Limited, a PLR Projects Group Company, is a new and ambitious hydrometallurgical copper extraction plant based in Kitwe, Zambia. We are actively recruiting skilled and experienced professionals to join our team as we prepare to commence production. If you’re ready to contribute your expertise in copper processing to a fast-growing organization in the heart of the Copperbelt, we want to hear from you!
-    </p>
-
-    <h2>Position & Number of Openings</h2>
-
-    <style>
+<style>
+    .careers p, li{
+        font-size: 20px;
+    }
     table {
         width: 80%;
-        margin: 0px 20px;
+        margin: 20px 20px;
         border-collapse: collapse;
         font-family: Arial, sans-serif;
-        font-size: 16px;
+        font-size: 20px;
     }
     th,
     td {
@@ -43,8 +36,18 @@
     }
 
     @media screen and (max-width: 768px) {
+        .careers p, li{
+            font-size: 14px;
+        }
+        .careers h2,h3{
+            font-size: 17px;
+        }
+        .careers h4{
+            font-size: 15px;
+        }
         table {
-        font-size: 10px;
+        font-size: 14px;
+        width: 90%;
         }
         th,
         td {
@@ -56,9 +59,6 @@
     }
 
     @media screen and (min-width: 1200px) {
-        table {
-        font-size: 14px;
-        }
         th,
         td {
         padding: 14px 16px;
@@ -67,8 +67,16 @@
         font-size: 20px;
         }
     }
-    </style>
+</style>
+<div class="container careers">
+    <h1 class="text-center">Careers</h1>
+    <h2>Career Opportunities at Swarna Metals Zambia Limited (Kitwe, Copperbelt)</h2>
+    <h4>Publication Date: 18th November, 2024.</h4>
+    <p>
+        Swarna Metals Zambia Limited, a PLR Projects Group Company, is a new and ambitious hydrometallurgical copper extraction plant based in Kitwe, Zambia. We are actively recruiting skilled and experienced professionals to join our team as we prepare to commence production. If you’re ready to contribute your expertise in copper processing to a fast-growing organization in the heart of the Copperbelt, we want to hear from you!
+    </p>
 
+    <h2>Position & Number of Openings</h2>
     <table>
     <thead>
         <tr>
@@ -187,7 +195,7 @@
     </tbody>
     </table>
 
-    <h2>Open Positions (Brief Job Description & Qualification)</h2>
+    <h3>Open Positions (Brief Job Description & Qualification)</h3>
 
     <div>
         <h3>1. Crushing Section In-charge</h3>

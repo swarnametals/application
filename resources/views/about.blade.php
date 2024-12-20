@@ -3,114 +3,101 @@
 @section('title', 'About Us')
 
 @section('content')
-
 <style>
-    .about-us h1, .about-us h2, .about-us h3, .about-us h4 {
-        font-family: 'Arial', sans-serif;
-        font-weight: bold;
+    h2,h3 {
+        font-size: 1.8rem;
+        color: #444;
+        border-bottom: 3px solid #ff5733;
+        display: inline-block;
+        padding-bottom: 5px;
     }
 
-    .about-us p {
-        line-height: 1.8;
-        font-size: 16px;
+    .row p {
+        font-size: 25px;
     }
 
-    .about-us ul {
-        padding-left: 20px;
-        list-style: disc;
-    }
-
-    .about-us ul li {
-        margin-bottom: 5px;
+    .row ul li {
+        font-size: 20px;
     }
 
     @media (max-width: 768px) {
-        iframe {
-            height: 300px;
+        .row p {
+            font-size: 17px;
         }
 
-        .about-us h1 {
-            font-size: 24px;
-        }
-
-        .about-us h2, .about-us h3, .about-us h4 {
-            font-size: 20px;
-        }
-
-        .about-us p, .about-us ul li {
+        .row ul li {
             font-size: 14px;
         }
     }
 </style>
 <section class="about-us">
     <div class="container">
+        <header class="text-center mb-5">
+            <h1>About Us</h1>
+        </header>
+
         <div class="row">
-            <!-- Left Column -->
-            <h1 class="text-center mb-4">About Us</h1>
-            <div class="col-md-6 mb-4">
+            <div class="col-lg-6 mb-4">
                 <h2>Our Commitment to Quality</h2>
                 <p>
-                    <strong>Swarna Metals Zambia Limited</strong> (SMZL) is a state-of-the-art greenfield hydrometallurgical
-                    copper extraction plant, strategically located 25 kilometers from Kitwe, in Zambia's Copperbelt Province.
-                    As a subsidiary of PLR Zambia Limited, SMZL is dedicated to producing high-quality copper cathodes
-                    and copper concentrates to meet the growing demand in the global copper market.
+                    <strong>Swarna Metals Zambia Limited</strong> (SMZL) is a state-of-the-art greenfield hydrometallurgical copper extraction plant,
+                    strategically located 25 kilometers from Kitwe, in Zambia's Copperbelt Province. As a subsidiary of PLR Zambia Limited, SMZL
+                    is dedicated to producing high-quality copper cathodes and concentrates to meet the growing global demand.
                 </p>
-                <h3>Key Highlights</h3>
-                <h4>Strategic Location</h4>
-                <p>SMZL is located in Zambia’s Copperbelt Province, a region abundant in copper ore reserves, facilitating efficient operations and logistics.</p>
-                <h4>Initial Milling Capacity</h4>
-                <p>The plant has a starting capacity of 1,200 tons per day (TPD), with plans to expand to 2,400 TPD in the near future.</p>
-                <h4>Production Targets (Phase 1)</h4>
+                <h3>Highlights</h3>
                 <ul>
-                    <li><strong>Copper Concentrate:</strong> 12,000 metric tons annually.</li>
-                    <li><strong>Copper Cathode:</strong> 2,400 metric tons annually with a purity of 99.99%.</li>
-                </ul>
-                <h4>Timeline</h4>
-                <p>Commissioning is scheduled for Q1 2025, initiating full-scale production and positioning SMZL as a key contributor to Zambia's industrial advancement.</p>
-
-                <h3>Key Contacts</h3>
-                <h4>Mr. Jayakumar Peddireddy</h4>
-                <ul>
-                    <li><strong>Position:</strong> CEO, Swarna Metals Zambia</li>
-                    <li><strong>Physical Address:</strong> J5, Zamsure Apartments, Lusaka, Zambia</li>
+                    <li><strong>Strategic Location:</strong> Zambia’s Copperbelt Province, abundant in copper ore reserves.</li>
+                    <li><strong>Capacity:</strong> Initial milling capacity of 1,200 tons/day, scaling to 2,400 tons/day.</li>
+                    <li><strong>Production Targets:</strong> 12,000 metric tons of copper concentrate and 2,400 metric tons of copper cathode annually.</li>
+                    <li><strong>Timeline:</strong> Commissioning in Q1 2025.</li>
                 </ul>
             </div>
 
-            <!-- Right Column -->
-            <div class="col-md-6 mb-4">
+            <div class="col-lg-6 mb-4">
                 <h2>Innovative Mining Solutions</h2>
                 <p>
-                    With a focus on innovation, sustainability, and operational excellence, SMZL is poised to become a leading player in Zambia's thriving copper processing industry. The company's vision aligns with the country's industrial growth, ensuring value addition at every stage of the copper value chain.
+                    With a focus on innovation, sustainability, and operational excellence, SMZL is set to become a leader in Zambia’s copper
+                    processing industry. Our vision aligns with Zambia's industrial growth, ensuring value addition at every stage of the copper value chain.
                 </p>
+            </div>
+        </div>
 
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <h3>Key Contacts</h3>
+                <p><strong>Mr. Jayakumar Peddireddy</strong></p>
+                <ul>
+                    <li><strong>Position:</strong> CEO, Swarna Metals Zambia</li>
+                    <li><strong>Address:</strong> J5, Zamsure Apartments, Lusaka, Zambia</li>
+                </ul>
+            </div>
+
+            <div class="col-lg-6 mb-4">
                 <h3>Group Company Information</h3>
-                <h4>Group Company Name: PLR Zambia Limited</h4>
-                <h4>Contact Details:</h4>
-                <h4>Mr. R N Niranjan Reddy</h4>
+                <p><strong>PLR Zambia Limited</strong></p>
+                <p><strong> Mr. R N Niranjan Reddy</strong></p>
                 <ul>
                     <li><strong>Position:</strong> CEO, PLR Zambia Ferro Alloys</li>
-                    <li><strong>Physical Address:</strong> J8, Zamsure Apartments, Lusaka, Zambia</li>
+                    <li><strong>Address:</strong> J8, Zamsure Apartments, Lusaka, Zambia</li>
                     <li><strong>Website:</strong> <a href="https://plrprojects.com" target="_blank">plrprojects.com</a></li>
                 </ul>
             </div>
         </div>
 
-        <div class="row">
-            <h1 class="text-left mb-3">Our Location</h1>
-            <div class="col-md-6">
+        <div class="row align-items-start">
+            <div class="col-lg-6">
+                <h3>Our Location</h3>
                 <p>
-                    Swarna Metals is located in Kitwe, Zambia, a hub for metal and mining industries, ensuring easy access to resources and markets.
+                    Swarna Metals is located in Kitwe, Zambia, a hub for the metal and mining industries, ensuring easy access to resources and markets.
                 </p>
-                <h2>Address</h2>
-                <p>Sabina Mufulira Road, Kitwe - 50100, Copperbelt, Zambia</p>
-                <h3>Hours</h3>
-                <p>8 AM - 5 PM</p>
+                <p><strong>Address:</strong> Sabina Mufulira Road, Kitwe - 50100, Copperbelt, Zambia</p>
+                <p><strong>Hours:</strong> 8 AM - 5 PM</p>
             </div>
 
-            <div class="col-md-6">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m23!1m12!1m3!1d174911.3188751776!2d28.05414839521786!3d-12.668204315985065!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m8!3e6!4m0!4m5!1s0x196ce3002a1d77bf%3A0xa596812ee0acff6b!2sFarm%20No%20F%2F4213%2FA%2C%20Kitwe-Mufilira%2C%20Kitwe!3m2!1d-12.6623824!2d28.155643599999998!5e0!3m2!1sen!2szm!4v1734504385088!5m2!1sen!2szm"
-                    width="100%" height="450" style="border:0; border-radius: 8px;"
-                    allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+            <div class="col-lg-6">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m23!1m12!1m3!1d174911.3188751776!2d28.05414839521786!3d-12.668204315985065!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m8!3e6!4m0!4m5!1s0x196ce3002a1d77bf%3A0xa596812ee0acff6b!2sFarm%20No%20F%2F4213%2FA%2C%20Kitwe-Mufilira%2C%20Kitwe!3m2!1d-12.6623824!2d28.155643599999998!5e0!3m2!1sen!2szm!4v1734504385088!5m2!1sen!2szm"
+                    width="100%" height="350" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy">
                 </iframe>
             </div>
         </div>

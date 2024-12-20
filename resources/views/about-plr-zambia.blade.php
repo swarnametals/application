@@ -29,13 +29,15 @@
 
     h2 {
         font-size: 1.8em;
-        border-bottom: 2px solid #ddd;
+        border-bottom: 3px solid #ff5733;
+        color: #444;
         padding-bottom: 5px;
         margin-top: 30px;
     }
 
-    p, ul {
+    .about-plr p, ul {
         margin-bottom: 15px;
+        font-size: 20px;
     }
 
     ul {
@@ -94,6 +96,11 @@
             font-size: 1.5em;
         }
 
+        .about-plr p, ul {
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
         table {
             font-size: 14px;
         }
@@ -104,7 +111,7 @@
     }
 </style>
 
-<div class="container">
+<div class="container about-plr">
     <h1>About PLR Zambia</h1>
 
     <section>
