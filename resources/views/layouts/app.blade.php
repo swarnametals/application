@@ -12,6 +12,8 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 
+  {{-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"> --}}
+
 <style>
     body, html {
         height: 100%;
@@ -118,13 +120,11 @@
         }
     }
 
-    /* General Styles */
     .main-footer {
-        /* background-color: #003366;  */
         background-color: #510404;
         color: white;
         margin-top: 40px;
-        padding: 10px 0 30px 0; 
+        padding: 10px 0 30px 0;
         width: 100%;
     }
 
@@ -136,16 +136,16 @@
     }
 
     .footer-link {
-        color: #ffffff; /* White links */
-        text-decoration: none; /* Remove underline */
+        color: #ffffff;
+        text-decoration: none;
         transition: color 0.3s ease;
-        display: flex; /* Align icon and text */
+        display: flex;
         align-items: center;
-        gap: 8px; /* Spacing between icon and text */
+        gap: 8px;
     }
 
     .footer-link:hover {
-        color: #ff5733; /* Gold on hover */
+        color: #ff5733;
     }
 
     .main-footer p, .main-footer ul {
@@ -155,31 +155,30 @@
     }
 
     .main-footer ul {
-        list-style: none; /* Remove bullet points */
+        list-style: none;
         padding-left: 0;
     }
 
     .main-footer .text-center {
-        font-size: 0.9rem; /* Slightly smaller text for copyright */
+        font-size: 0.9rem;
         margin-top: 20px;
         color: #ffffff;
     }
 
     .main-footer i {
-        font-size: 1.1rem; /* Adjust icon size */
-        margin-right: 8px; /* Add space between icon and text */
+        font-size: 1.1rem;
+        margin-right: 8px;
         color: #ffffff;
     }
 
-    /* Responsive Design */
     @media (max-width: 768px) {
         .main-footer h5 {
-            font-size: 1.25rem; /* Adjust heading size */
+            font-size: 1.25rem;
             text-align: center;
         }
 
         .main-footer .row {
-            text-align: center; /* Center-align text for smaller screens */
+            text-align: center;
         }
 
         .main-footer p {
@@ -193,25 +192,23 @@
         }
 
         .footer-link {
-            font-size: 0.95rem; /* Adjust link size */
+            font-size: 0.95rem;
         }
     }
 
     @media (max-width: 576px) {
         .main-footer h5 {
-            font-size: 1.1rem; /* Further adjust heading size */
+            font-size: 1.1rem;
         }
 
         .main-footer p, .footer-link {
-            font-size: 0.85rem; /* Reduce font size for very small screens */
+            font-size: 0.85rem;
         }
 
         .footer-link i {
-            font-size: 1rem; /* Smaller icon size */
+            font-size: 1rem;
         }
     }
-
-
 </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -228,6 +225,10 @@
   @include('layouts.footer')
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 <script>
     function toggleMenu() {
         const nav = document.getElementById('navbarNav');

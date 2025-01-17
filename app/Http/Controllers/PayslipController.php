@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\EmployeeImport;
 use App\Models\Employee;
+use App\Models\Payslip;
 
 class PayslipController extends Controller {
     public function showUploadForm() {
@@ -18,17 +19,13 @@ class PayslipController extends Controller {
         ]);
 
         try {
-            // Create a new import instance
             $import = new \App\Imports\EmployeeImport();
 
-            // Import the file
             Excel::import($import, $request->file('file'));
 
-            // Retrieve failures using the new method
             $failures = $import->getFailures();
 
             if (count($failures) > 0) {
-                // Log details of failed rows
                 foreach ($failures as $failure) {
                     \Log::warning("Row {$failure->row()}: " . implode(', ', $failure->errors()));
                 }
@@ -48,14 +45,72 @@ class PayslipController extends Controller {
     }
 
     public function generate() {
-            $employees = Employee::all();
+        $employees = Employee::all();
 
-            foreach ($employees as $employee) {
-                $pdf = Pdf::loadView('payslips.template', compact('employee'));
+        $zip = new \ZipArchive();
+        $zipFileName = 'payslips_' . now()->format('Y_m_d_H_i_s') . '.zip';
+        $zipFilePath = storage_path($zipFileName);
 
-                return $pdf->download("payslip_{$employee->id_number}_payslip.pdf");
+        if ($zip->open($zipFilePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+            return redirect()->back()->with('error', 'Could not create ZIP file.');
+        }
+
+        foreach ($employees as $employee) {
+            $grossEarnings = $employee->basic_salary
+                + $employee->housing_allowance
+                + $employee->transport_allowance
+                + $employee->other_allowances
+                + $employee->overtime_pay
+                + $employee->lunch_allowance;
+
+            $napsa = $grossEarnings * 0.05;
+            $nhima = $employee->basic_salary * 0.01;
+
+            if ($grossEarnings > 9200) {
+                $zra = (5100 * 0) + (2000 * 0.2) + (2100 * 0.3) + (($grossEarnings - 9200) * 0.37);
+            } elseif ($grossEarnings > 7100) {
+                $zra = (5100 * 0) + (2000 * 0.2) + (($grossEarnings - 7100) * 0.3);
+            } elseif ($grossEarnings > 5100) {
+                $zra = (5100 * 0) + (($grossEarnings - 5100) * 0.2);
+            } else {
+                $zra = 0;
             }
 
-        return redirect()->back()->with('success', 'Payslips generated successfully.');
+            $totalDeductions = $employee->loan_recovery + $employee->other_deductions + $zra + $nhima + $napsa;
+            $netPay = $grossEarnings - $totalDeductions;
+
+            $payslipData = [
+                'gross_pay_ytd' => Payslip::where('employee_id', $employee->id)->sum('gross_earnings'),
+                'tax_paid_ytd' => Payslip::where('employee_id', $employee->id)->sum('tax_deduction'),
+                'napsa_ytd' => Payslip::where('employee_id', $employee->id)->sum('napsa_contribution'),
+                'pension_ytd' => Payslip::where('employee_id', $employee->id)->sum('napsa_contribution'),
+                'basic_salary' => $employee->basic_salary,
+                'housing_allowance' => $employee->housing_allowance,
+                'health_insurance' => $nhima,
+                'napsa' => $napsa,
+                'transport_allowance' => $employee->transport_allowance,
+                'other_allowances' => $employee->other_allowances,
+                'overtime_pay' => $employee->overtime_pay,
+                'overtime_hours' => $employee->overtime_hours,
+                'lunch_allowance' => $employee->lunch_allowance,
+                'loan_recovery' => $employee->loan_recovery,
+                'other_deductions' => $employee->other_deductions,
+                'total_earnings' => $grossEarnings,
+                'total_deductions' => $totalDeductions,
+                'net_pay' => $netPay,
+                'payment_method' => $employee->payment_method,
+                'social_security_number' => $employee->social_security_number,
+                'bank_account_number' => $employee->bank_account_number,
+            ];
+
+            $pdf = Pdf::loadView('payslips.template', compact('employee', 'payslipData'));
+            $fileName = "payslip_{$employee->name}.pdf";
+
+            $zip->addFromString($fileName, $pdf->output());
+        }
+
+        $zip->close();
+
+        return response()->download($zipFilePath)->deleteFileAfterSend(true);
     }
 }

@@ -4,47 +4,50 @@
 
 @section('content')
 <div class="container mt-5">
-    <h2>Applicant Details</h2>
+    <a href="{{ route('applications.index') }}" class="btn btn-secondary mb-4">Back to Applications</a>
 
-    <!-- Applicant Information -->
-    <div class="card">
+    <h2 class="mb-4">Applicant Details</h2>
+
+    <div class="card shadow-sm">
         <div class="card-body">
             <h5 class="card-title">{{ $application->first_name }} {{ $application->last_name }}</h5>
+            <hr>
             <p><strong>Email:</strong> {{ $application->email }}</p>
             <p><strong>Phone:</strong> {{ $application->phone }}</p>
             <p><strong>Position Applied For:</strong> {{ $application->position_applied_for }}</p>
-            <p><strong>Years of Experience:</strong> {{ $application->years_of_experience }}</p>
+            <p><strong>Years of Experience:</strong> {{ $application->years_of_experience }} Year{{ $application->years_of_experience > 1 ? 's' : '' }}</p>
 
-            <!-- Resume -->
-            <p><strong>Resume:</strong>
-                @if ($application->resume_path)
-                    <a href="{{ asset('storage/' . $application->resume_path) }}" target="_blank">View Resume</a>
-                @else
-                    Not provided
-                @endif
-            </p>
-
-            <!-- Cover Letter -->
-            <p><strong>Cover Letter:</strong>
-                @if ($application->cover_letter_path)
-                    <a href="{{ asset('storage/' . $application->cover_letter_path) }}" target="_blank">View Cover Letter</a>
-                @else
-                    Not provided
-                @endif
-            </p>
-
-            <!-- Certificates -->
-            <p><strong>Certificates:</strong></p>
-            @forelse ($application->certificates as $certificate)
-                <p>
-                    <a href="{{ asset('storage/' . $certificate->file_path) }}" target="_blank">View Certificate</a>
+            <div class="mb-3">
+                <p><strong>Resume:</strong>
+                    @if ($application->resume_path)
+                        <a href="{{ asset('storage/' . $application->resume_path) }}" target="_blank" class="btn btn-link">View Resume</a>
+                    @else
+                        <span class="text-muted">Not provided</span>
+                    @endif
                 </p>
-            @empty
-                <p>No certificates uploaded.</p>
-            @endforelse
+            </div>
+
+            <div class="mb-3">
+                <p><strong>Cover Letter:</strong>
+                    @if ($application->cover_letter_path)
+                        <a href="{{ asset('storage/' . $application->cover_letter_path) }}" target="_blank" class="btn btn-link">View Cover Letter</a>
+                    @else
+                        <span class="text-muted">Not provided</span>
+                    @endif
+                </p>
+            </div>
+
+            <div>
+                <p><strong>Certificates:</strong></p>
+                @forelse ($application->certificates as $certificate)
+                    <p>
+                        <a href="{{ asset('storage/' . $certificate->file_path) }}" target="_blank" class="btn btn-link">View Certificate</a>
+                    </p>
+                @empty
+                    <p class="text-muted">No certificates uploaded.</p>
+                @endforelse
+            </div>
         </div>
     </div>
-
-    <a href="{{ route('applications.index') }}" class="btn btn-primary mt-4">Back to Applications</a>
 </div>
 @endsection

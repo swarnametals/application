@@ -3,19 +3,48 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Employee;
+use App\Models\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
-class UserController extends Controller
-{
-    public function create()
-    {
+class UserController extends Controller {
+    public function create() {
         return view('users.create');
     }
 
-    public function store(Request $request)
-    {
+    public function show(User $user) {
+        $user = Auth::user();
+        return view('users.show', compact('user'));
+    }
+
+    public function dashboard() {
+        $employeesTotal = Employee::count();
+        $applicationsTotal = Application::count();
+
+        return view('dashboards.admin', compact('employeesTotal','applicationsTotal'));
+    }
+
+    public function changePassword(Request $request) {
+        $user = Auth::user();
+
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:8|confirmed',
+        ]);
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Current password is incorrect']);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return redirect()->route('users.show')->with('success', 'Password changed successfully');
+    }
+
+    public function store(Request $request) {
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users',
@@ -33,12 +62,11 @@ class UserController extends Controller
         return redirect()->route('users.create')->with('success', 'User created successfully.');
     }
 
-    public function showLoginForm(){
-         return view('users.login');
+    public function showLoginForm() {
+        return view('users.login');
     }
 
-    public function login(Request $request)
-    {
+    public function login(Request $request) {
         $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
@@ -51,8 +79,7 @@ class UserController extends Controller
         return back()->withErrors(['email' => 'Invalid credentials.']);
     }
 
-    public function logout()
-    {
+    public function logout() {
         Auth::logout();
         return redirect()->route('login')->with('success', 'Logged out successfully.');
     }

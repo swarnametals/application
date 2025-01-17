@@ -9,7 +9,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class EmployeeController extends Controller {
     public function index() {
-        $employees = Employee::paginate(10);
+        $employees = Employee::all();
 
         return view('employees.index', compact('employees'));
     }
@@ -26,14 +26,14 @@ class EmployeeController extends Controller {
             'grade' => 'required|string|max:255',
             'team' => 'nullable|string|max:255',
             'basic_salary' => 'required|numeric|min:0',
-            'housing_allowance' => 'nullable|numeric|min:0',
-            'transport_allowance' => 'nullable|numeric|min:0',
-            'other_allowances' => 'nullable|numeric|min:0',
+            'housing_allowance' => 'required|numeric|min:0',
+            'transport_allowance' => 'required|numeric|min:0',
+            'other_allowances' => 'required|numeric|min:0',
             'overtime_hours' => 'nullable|numeric|min:0',
             'overtime_pay' => 'nullable|numeric|min:0',
-            'lunch_allowance' => 'nullable|numeric|min:0',
-            'loan_recovery' => 'nullable|numeric|min:0',
-            'other_deductions' => 'nullable|numeric|min:0',
+            'lunch_allowance' => 'required|numeric|min:0',
+            'loan_recovery' => 'required|numeric|min:0',
+            'other_deductions' => 'required|numeric|min:0',
             'payment_method' => 'required|string|max:255',
             'social_security_number' => 'required|string|max:255',
             'bank_name' => 'nullable|string',
@@ -41,10 +41,8 @@ class EmployeeController extends Controller {
             'bank_account_number' => 'nullable|string',
         ]);
 
-        // Create employee
         $employee = Employee::create($validated);
 
-        // Calculate earnings and deductions
         $grossEarnings = $employee->basic_salary
             + $employee->housing_allowance
             + $employee->transport_allowance
@@ -68,7 +66,6 @@ class EmployeeController extends Controller {
         $totalDeductions = $employee->loan_recovery + $employee->other_deductions + $zra + $nhima;
         $netPay = $grossEarnings - $totalDeductions;
 
-        // Create payslip
         Payslip::create([
             'employee_id' => $employee->id,
             'gross_earnings' => $grossEarnings,
@@ -127,45 +124,9 @@ class EmployeeController extends Controller {
         return redirect()->route('employees.index')->with('success', 'Employee deleted successfully.');
     }
 
-    // public function generatePayslip($employee) {
-    //     $employee = Employee::findOrFail($employee);
-
-
-    //     $payslipData = [
-    //         'gross_pay_ytd' => 50000.00,
-    //         'tax_paid_ytd' => 5000.00,
-    //         'napsa_ytd' => 3000.00,
-    //         'pension_ytd' => 2000.00,
-    //         'leave_balance' => 15,
-    //         'basic_pay' => 10000.00,
-    //         'housing_allowance' => 2000.00,
-    //         'transport_allowance' => 1500.00,
-    //         'overtime_hours' => 10,
-    //         'overtime_pay' => 1200.00,
-    //         'other_allowances' => 500.00,
-    //         'napsa_contribution' => 300.00,
-    //         'tax_deduction' => 1000.00,
-    //         'health_insurance' => 200.00,
-    //         'other_deductions' => 150.00,
-    //         'total_earnings' => 13200.00,
-    //         'total_deductions' => 1650.00,
-    //         'net_pay' => 11550.00,
-    //         'payment_method' => 'Bank Transfer',
-    //         'social_security_number' => '123-45-6789',
-    //         'bank_account_number' => '987654321',
-    //     ];
-
-    //     $pdf = Pdf::loadView('payslips.template', compact('employee', 'payslipData'));
-
-    //     return $pdf->download("{$employee->name}_payslip.pdf");
-    // }
-
     public function generatePayslip($employeeId) {
-        // work on leave balance and pension_ytd
-        // overtime and hours
         $employee = Employee::findOrFail($employeeId);
 
-        // Calculate earnings and deductions
         $grossEarnings = $employee->basic_salary
             + $employee->housing_allowance
             + $employee->transport_allowance
@@ -176,7 +137,6 @@ class EmployeeController extends Controller {
         $napsa = $grossEarnings * 0.05;
         $nhima = $employee->basic_salary * 0.01;
 
-        // Tax calculation
         if ($grossEarnings > 9200) {
             $zra = (5100 * 0) + (2000 * 0.2) + (2100 * 0.3) + (($grossEarnings - 9200) * 0.37);
         } elseif ($grossEarnings > 7100) {
@@ -190,7 +150,6 @@ class EmployeeController extends Controller {
         $totalDeductions = $employee->loan_recovery + $employee->other_deductions + $zra + $nhima + $napsa;
         $netPay = $grossEarnings - $totalDeductions;
 
-        // Prepare payslip data
         $payslipData = [
             'gross_pay_ytd' => Payslip::where('employee_id', $employee->id)->sum('gross_earnings'),
             'tax_paid_ytd' => Payslip::where('employee_id', $employee->id)->sum('tax_deduction'),

@@ -843,3 +843,371 @@
 <br>
 <a class="btn btn-info mt-4" href="{{ route('applications.track')}}">Track your application</a> --}}
 @endsection
+
+<!-- pd template  -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Payslip</title>
+<style>
+    body {
+        font-family: sans-serif;
+        background-image: url('{{ public_path('images/logo_circle.jpg') }}');
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 500px;
+        opacity: 1;
+    }
+
+    .payslip {
+        padding: 10px;
+        margin: 10px auto;
+        max-width: 700px;
+        background: rgba(255, 255, 255, 0.78);
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .center-text {
+        text-align: center;
+    }
+
+    .logo {
+        display: block;
+        margin: 0 auto 10px;
+        max-width: 80px;
+        height: auto;
+    }
+
+    .company-header {
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+    .company-header h1 {
+        margin: 0;
+        color: #510404;
+        font-size: 30px;
+        font-weight: bold;
+    }
+
+    .payslip table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 10px;
+    }
+
+    .payslip th, .payslip td {
+        padding: 4px;
+        border: 1px solid #000000;
+        font-size: 12px;
+        text-align: left;
+    }
+
+    .payslip .bold {
+        font-weight: bold;
+    }
+
+    .payslip .right {
+        text-align: right;
+    }
+
+    .payslip p {
+        font-size: 11px;
+    }
+
+    .payslip h4 {
+        margin-bottom: 0px;
+    }
+</style>
+
+</head>
+<body>
+    <div class="payslip">
+        <div class="center-text">
+            <img src="{{ public_path('images/logo_circle.jpg') }}" alt="Swarna Metals Logo" class="logo">
+        </div>
+
+        <div class="company-header">
+            <h1>SWARNA METALS ZAMBIA LIMITED</h1>
+        </div>
+
+        <div class="title">
+            <h4><strong>Pay Slip</strong></h4>
+        </div>
+        <table>
+            <tr>
+                <th>Employee Name:</th>
+                <td>{{ $employee->name }}</td>
+                <th>Employee ID:</th>
+                <td>{{ $employee->id_number }}</td>
+            </tr>
+            <tr>
+                <th>Designation:</th>
+                <td>{{ $employee->position }}</td>
+                <th>Grade:</th>
+                <td>{{ $employee->grade }}</td>
+            </tr>
+            <tr>
+                <th>Department/Team:</th>
+                <td colspan="3">{{ $employee->team }}</td>
+            </tr>
+        </table>
+
+        <h4>Year-to-Date Summary</h4>
+        <table>
+            <tr>
+                <th>Gross Pay YTD:</th>
+                <td>{{ number_format($payslipData['gross_pay_ytd'], 2) }} ZMW</td>
+                <th>Tax (ZRA) Paid YTD:</th>
+                <td>{{ number_format($payslipData['tax_paid_ytd'], 2) }} ZMW</td>
+            </tr>
+            <tr>
+                <th>NAPSA Contribution YTD:</th>
+                <td>{{ number_format($payslipData['napsa_ytd'], 2) }} ZMW</td>
+                <th>Pension Contribution YTD:</th>
+                <td>{{ number_format($payslipData['pension_ytd'], 2) }} ZMW</td>
+            </tr>
+            <tr>
+                <th>Leave Balance (Days):</th>
+                <td>-</td>
+                <td colspan="2"></td>
+            </tr>
+        </table>
+
+        <h4>Earnings</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Description</th>
+                    <th>Shift/Hrs</th>
+                    <th>Amount (ZMW)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>E01</td>
+                    <td>Basic Pay</td>
+                    <td></td>
+                    <td>{{ $employee->basic_salary }}</td>
+                </tr>
+                <tr>
+                    <td>E02</td>
+                    <td>Housing Allowance</td>
+                    <td></td>
+                    <td>{{ number_format($payslipData['housing_allowance'], 2) }}</td>
+                </tr>
+                <tr>
+                    <td>E03</td>
+                    <td>Lunch Allowance</td>
+                    <td></td>
+                    <td>{{ number_format($payslipData['lunch_allowance'], 2) }}</td>
+                </tr>
+                <tr>
+                    <td>E04</td>
+                    <td>Transport Allowance</td>
+                    <td></td>
+                    <td>{{ number_format($payslipData['transport_allowance'], 2) }}</td>
+                </tr>
+                <tr>
+                    <td>E05</td>
+                    <td>Overtime Pay</td>
+                    <td>{{ number_format($payslipData['overtime_hours'], 2) }}</td>
+                    <td>{{ number_format($payslipData['overtime_pay'], 2) }}</td>
+                </tr>
+                <tr>
+                    <td>E06</td>
+                    <td>Other Allowances</td>
+                    <td></td>
+                    <td>{{ number_format($payslipData['other_allowances'], 2) }}</td>
+                </tr>
+                <tr>
+                    <th colspan="3">Total Earnings</th>
+                    <th>{{ number_format($payslipData['total_earnings'], 2) }}</th>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4>Deductions</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Description</th>
+                    <th>Amount (ZMW)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>D01</td>
+                    <td>NAPSA Contribution</td>
+                    <td>{{ number_format($payslipData['napsa'], 2) }}</td>
+                </tr>
+                <tr>
+                    <td>D02</td>
+                    <td>Health Insurance (NHIMA)</td>
+                    <td>{{ number_format($payslipData['health_insurance'], 2) }}</td>
+                </tr>
+                <tr>
+                    <td>D03</td>
+                    <td>Loan Recovery</td>
+                    <td>{{ number_format($payslipData['loan_recovery'], 2) }}</td>
+                </tr>
+                <tr>
+                    <td>D04</td>
+                    <td>Other Deductions</td>
+                    <td>{{ number_format($payslipData['other_deductions'], 2) }}</td>
+                </tr>
+                <tr>
+                    <td>D05</td>
+                    <td>Tax Deduction (ZRA)</td>
+                    <td>{{ number_format($payslipData['tax_paid_ytd'], 2) }}</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Total Deductions</th>
+                    <th>{{ number_format($payslipData['total_deductions'], 2) }}</th>
+                </tr>
+            </tbody>
+        </table>
+
+        <p><strong>Net Pay:</strong> {{ number_format($payslipData['net_pay'], 2) }} ZMW</p>
+        <p><strong>Payment Method:</strong> {{ $employee->payment_method }}</p>
+
+        <h4>Additional Information</h4>
+        <p style="display: inline-block; margin-right: 20px;">
+            <strong>Social Security Number:</strong> {{ $employee->social_security_number }}
+        </p>
+        <p style="display: inline-block;">
+            <strong>Bank Name:</strong> {{ $employee->bank_name }}
+        </p>
+        <p style="display: inline-block; margin-right: 20px;">
+            <strong>Branch Name:</strong> {{ $employee->branch_name }}
+        </p>
+        <p style="display: inline-block;">
+            <strong>Bank Account Number:</strong> {{ $employee->bank_account_number }}
+        </p>
+        <p><strong>Prepared By:</strong>............................................................................................................................   <strong>Date:</strong>.............................................</p>
+    </div>
+</body>
+</html>
+<div class="qr-code">
+            <img src="{{ public_path('images/qr-code-swarna.png') }}" alt="QR Code">
+        </div>
+
+
+<!-- --------------------------Admin Dashboard------------------------ -->
+@extends('layouts.app')
+
+@section('title', 'Admin Dashboard')
+
+@section('content')
+@include('partials.sidebar')
+            <h2 class="mb-4 text-center">Swarna Metals Admin Dashboard</h2>
+            <!-- Key Metrics -->
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <div class="card text-white bg-success">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-users"></i> Active Employees
+                            </h5>
+                            <p class="card-text h4">{{ $employeesTotal }}</p>
+                            <a href="{{ route('employees.index') }}" class="btn btn-light btn-sm">Manage Employees</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card text-white bg-primary">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-file-alt"></i> Total Applications
+                            </h5>
+                            <p class="card-text h4">{{ $applicationsTotal }}</p>
+                            <a href="{{ route('applications.index') }}" class="btn btn-light btn-sm">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card text-white bg-warning">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-chart-line"></i> Production Rate
+                            </h5>
+                            <p class="card-text h4">85%</p>
+                            <a href="{{ route('not-implemented-yet') }}" class="btn btn-light btn-sm">View Reports</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card text-white bg-danger">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-warehouse"></i> Inventory
+                            </h5>
+                            <p class="card-text h4">1345</p>
+                            <a href="{{ route('not-implemented-yet') }}" class="btn btn-light btn-sm">Track Inventory</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Monthly Production (Tons)</h5>
+                            <canvas id="productionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Production Breakdown</h5>
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Add ChartJS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const productionCtx = document.getElementById('productionChart').getContext('2d');
+    new Chart(productionCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+            datasets: [{
+                label: 'Production (Tons)',
+                data: [120, 150, 170, 130, 180, 200, 210],
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                fill: true
+            }]
+        },
+        options: { responsive: true }
+    });
+
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(revenueCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Copper Cathodes', 'Copper Concentrate'],
+            datasets: [{
+                label: 'Revenue',
+                data: [60, 40],
+                backgroundColor: ['#ffcd56', '#4bc0c0'],
+            }]
+        },
+        options: { responsive: true }
+    });
+</script>
+@endsection

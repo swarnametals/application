@@ -2,31 +2,42 @@
 
 @section('content')
 <div class="container mt-5">
-    <a href="{{ route('employees.index') }}" class="btn btn-primary mb-3">
-        Back
-    </a>
+    <div class="d-flex flex-wrap gap-2 mb-3">
+        <a href="{{ route('employees.index') }}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+        <a href="{{ route('employees.generatePayslip', $employee->id) }}" class="btn btn-primary"><i class="fas fa-print"></i> Print Payslip</a>
+    </div>
 
     <div class="card mb-4">
         <div class="card-header">
             <h3>Employee Details</h3>
         </div>
         <div class="card-body">
-            <p><strong>Name:</strong> {{ $employee->name }}</p>
-            <p><strong>ID Number:</strong> {{ $employee->id_number }}</p>
-            <p><strong>Position:</strong> {{ $employee->position }}</p>
-            <p><strong>Grade:</strong> {{ $employee->grade }}</p>
-            <p><strong>Team:</strong> {{ $employee->team }}</p>
-            <p><strong>Basic Salary:</strong> {{ number_format($employee->basic_salary, 2) }} ZMW</p>
-            <p><strong>Housing Allowance:</strong> {{ number_format($employee->housing_allowance, 2) }} ZMW</p>
-            <p><strong>Transport Allowance:</strong> {{ number_format($employee->transport_allowance, 2) }} ZMW</p>
-            <p><strong>Other Allowances:</strong> {{ number_format($employee->other_allowances, 2) }} ZMW</p>
-            <p><strong>Overtime Hours:</strong> {{ number_format($employee->overtime_hours, 2) }}</p>
-            <p><strong>Overtime Pay:</strong> {{ number_format($employee->overtime_pay, 2) }} ZMW</p>
-            <p><strong>Lunch Allowance:</strong> {{ number_format($employee->lunch_allowance, 2) }} ZMW</p>
-            <p><strong>Payment Method:</strong> {{ $employee->payment_method }}</p>
-            <p><strong>Bank Account Number:</strong> {{ $employee->bank_account_number }}</p>
-            <p><strong>Bank Name:</strong> {{ $employee->bank_name }}</p>
-            <p><strong>Branch Name:</strong> {{ $employee->branch_name }}</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Name:</strong> {{ $employee->name }}</p>
+                    <p><strong>ID Number:</strong> {{ $employee->id_number }}</p>
+                    <p><strong>Position:</strong> {{ $employee->position }}</p>
+                    <p><strong>Grade:</strong> {{ $employee->grade }}</p>
+                    <p><strong>Team:</strong> {{ $employee->team }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Basic Salary:</strong> {{ number_format($employee->basic_salary, 2) }} ZMW</p>
+                    <p><strong>Housing Allowance:</strong> {{ number_format($employee->housing_allowance, 2) }} ZMW</p>
+                    <p><strong>Transport Allowance:</strong> {{ number_format($employee->transport_allowance, 2) }} ZMW</p>
+                    <p><strong>Other Allowances:</strong> {{ number_format($employee->other_allowances, 2) }} ZMW</p>
+                    <p><strong>Overtime Hours:</strong> {{ number_format($employee->overtime_hours, 2) }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Overtime Pay:</strong> {{ number_format($employee->overtime_pay, 2) }} ZMW</p>
+                    <p><strong>Lunch Allowance:</strong> {{ number_format($employee->lunch_allowance, 2) }} ZMW</p>
+                    <p><strong>Payment Method:</strong> {{ $employee->payment_method }}</p>
+                    <p><strong>Bank Account Number:</strong> {{ $employee->bank_account_number }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Bank Name:</strong> {{ $employee->bank_name }}</p>
+                    <p><strong>Branch Name:</strong> {{ $employee->branch_name }}</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -38,8 +49,9 @@
             @if($employee->payslips->isEmpty())
                 <p>No payslips available for this employee.</p>
             @else
-                <table class="table table-bordered">
-                    <thead>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
                         <tr>
                             <th>#</th>
                             <th>Gross Earnings</th>
@@ -66,6 +78,7 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
             @endif
         </div>
     </div>

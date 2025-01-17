@@ -6,14 +6,12 @@ use App\Models\Application;
 use App\Models\Certificate;
 use Illuminate\Http\Request;
 
-class ApplicationController extends Controller
-{
-    public function create()
-    {
+class ApplicationController extends Controller {
+    public function create() {
         return view('applications.create');
     }
 
-    public function store(Request $request){
+    public function store(Request $request) {
         $validatedData = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -28,13 +26,11 @@ class ApplicationController extends Controller
             'certificates.*' => 'file|mimes:pdf,doc,docx|max:10240',
         ]);
 
-        // Store application data excluding the certificates
         try {
             $application = Application::create(
                 $request->except(['certificates', 'resume_path', 'cover_letter_path'])
             );
 
-            // Handle file uploads (resume, cover letter, and certificates)
             if ($request->hasFile('resume')) {
                 $resumePath = $request->file('resume')->store('resumes', 'public');
                 $application->resume_path = $resumePath;
@@ -45,7 +41,6 @@ class ApplicationController extends Controller
                 $application->cover_letter_path = $coverLetterPath;
             }
 
-            // Store certificates if provided
             if ($request->has('certificates')) {
                 foreach ($request->file('certificates') as $file) {
                     $certificatePath = $file->store('certificates', 'public');
@@ -92,7 +87,6 @@ class ApplicationController extends Controller
     public function index(Request $request) {
         $query = Application::with('certificates');
 
-        // Apply filters if parameters are present
         if ($request->years_of_experience) {
             $query->where('years_of_experience', $request->input('years_of_experience'));
         }
@@ -101,14 +95,12 @@ class ApplicationController extends Controller
             $query->where('position_applied_for', $request->input('position_applied_for'));
         }
 
-        // Sort by the most recent application
         $applications = $query->orderBy('created_at', 'desc')->get();
 
         return view('applications.index', compact('applications'));
     }
 
-    public function uploadCertificates(Request $request, Application $application)
-    {
+    public function uploadCertificates(Request $request, Application $application) {
         $request->validate([
             'certificates.*' => 'required|file',
         ]);
