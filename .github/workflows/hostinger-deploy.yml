@@ -3,32 +3,35 @@ name: Deploy
 on:
   push:
     branches: [main]
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.1"
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Install PHP
-        uses: shivammathur/setup-php@v2
+      - uses: mirromutth/mysql-action@v1.1
         with:
-          php-version: "8.1"
+          mysql database: u265872520_swarnametals
+          mysql user: u265872520_swarna_user
+          mysql password: Sswarna@MQ5341
       - name: Copy .env
         run: cp .env.example .env
       - name: Install composer Dependencies
-        run: composer install --no-ansi --no-interaction --no-progress --prefer-dist
-      - name: Install Node.js Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Install node dependencies
         run: npm ci
-      - name: Setup Laravel
+      - name: Setup Project
         run: |
           php artisan config:clear
           php artisan cache:clear
           php artisan key:generate
           npm run build
-      - name: Set Directory Permissions
+      - name: Directory Permissions
         run: chmod 755 -R storage bootstrap/cache
       - name: Deploy to Server
         if: ${{ success() }}
@@ -40,7 +43,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script_stop: true
           script: |
-            cd /path/to/project
+            cd domains
+            cd swarnametals.com
             git pull
-            composer install
+            php composer.phar install
             php artisan migrate --force
