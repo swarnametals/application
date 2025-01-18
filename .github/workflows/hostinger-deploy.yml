@@ -41,7 +41,6 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_KEY }}
-          script_stop: true
           script: |
             cd domains
             cd swarnametals.com
