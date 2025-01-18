@@ -454,7 +454,7 @@
         <li>In Person: Human Resource Department, Swarna Metals Zambia Limited, a PLR Group Company, F/4213/A, Sabina Mufulira Road, Kitwe - 50100, Copperbelt, Zambia</li>
     </ul>
 
-    <p><strong>Application Deadline:</strong> 31st December 2024</p>
+    <p><strong>Application Deadline:</strong> 31st January 2025</p>
     <p><strong>Why Join Us?</strong> Be part of a dynamic team driving innovation in Zambia’s copper industry. Join us in our journey towards excellence!</p>
 
 </div>

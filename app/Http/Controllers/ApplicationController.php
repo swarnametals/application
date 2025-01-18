@@ -53,9 +53,30 @@ class ApplicationController extends Controller {
 
             $application->save();
 
-            return redirect()->route('applications.create')->with('success', 'Application submitted successfully.');
+            return redirect()->route('applications.create')->with('success', $request->first_name.' '.  $request->last_name.' '.'Your Application was submitted successfully.');
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'There was an error processing your application. Please try again.'])->withInput();
+        }
+    }
+
+    public function edit(Application $application) {
+        $statuses = ['Pending', 'Reviewed', 'Accepted', 'Rejected'];
+        return view('applications.edit', compact('application', 'statuses'));
+    }
+
+    public function update(Request $request, Application $application) {
+        $validatedData = $request->validate([
+            'status' => 'required|in:Pending,Reviewed,Accepted,Rejected',
+        ]);
+
+        try {
+            $application->status = $validatedData['status'];
+            $application->save();
+
+            return redirect()->route('applications.show', $application->id)
+                ->with('success', 'Application status updated successfully.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Failed to update application status. Please try again.'])->withInput();
         }
     }
 
@@ -76,7 +97,6 @@ class ApplicationController extends Controller {
 
         return view('applications.track-status', ['application' => $application]);
     }
-
 
     public function show($id) {
         $application = Application::with('certificates')->findOrFail($id);

@@ -4,8 +4,10 @@
 
 @section('content')
 <div class="container mt-5">
+    <h4 class="text-light bg-danger">IMPORTANT: Please submit your application only once. You will be contacted once your application has been considered.</h4>
+    <p><a href="{{ route('applications.track') }}">If you have already applied, kindly track your application here.</a></p>
 
-    <h2>Submit Application</h2>
+    <h2>Online Application</h2>
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul>
@@ -88,7 +90,7 @@
             </div>
 
             <div class="mb-3">
-                <label for="resume" class="form-label">Resume</label>
+                <label for="resume" class="form-label">CV</label>
                 <input type="file" class="form-control" id="resume" name="resume" required>
                 <small class="form-text text-muted">
                     Allowed file types: PDF, DOC, DOCX. Maximum file size: 10MB.
@@ -110,7 +112,7 @@
             </div>
 
             <div class="mb-3">
-                <label for="certificate_1" class="form-label">Upload Certified Copies of Academic and Professional Certificates</label>
+                <label for="certificate_1" class="form-label">Upload Certified Copies of Academic and Professional Certificates <span class="text-danger">(In one PDF Document)</span></label>
                 <input type="file" class="form-control" id="certificate_1" name="certificates[]">
                 <small class="form-text text-muted">
                     Allowed file types: PDF, DOC, DOCX. Maximum file size: 10MB.

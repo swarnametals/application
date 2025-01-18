@@ -67,6 +67,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/applications', [ApplicationController::class, 'index'])->name('applications.index');
     Route::get('/applications/{application}', [ApplicationController::class, 'show'])->name('applications.show');
+    Route::get('/applications/edit/{application}', [ApplicationController::class, 'edit'])->name('applications.edit');
+    Route::patch('/applications/update/{application}', [ApplicationController::class, 'update'])->name('applications.update');
+
     Route::get('/payslips/upload', [PayslipController::class, 'showUploadForm'])->name('payslips.uploadForm');
     Route::post('/payslips/upload', [PayslipController::class, 'upload'])->name('payslips.upload');
     Route::get('/payslips/generate', [PayslipController::class, 'generate'])->name('payslips.generate');
