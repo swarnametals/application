@@ -1211,3 +1211,118 @@
     });
 </script>
 @endsection
+
+<!-- -----------------------------application store method ------------------------------------------------------------ -->
+public function store(Request $request) {
+        $validatedData = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|string|email',
+            'phone' => 'required|string|max:20',
+            'nrc_number' => 'required|string|max:20',
+            'position_applied_for' => 'required|string|max:255',
+            'years_of_experience' => 'required|integer|min:0',
+            'resume' => 'required|file|mimes:pdf,doc,docx|max:10240',
+            'cover_letter' => 'required|file|mimes:pdf,doc,docx|max:10240',
+            'certificates' => 'nullable|array',
+            'certificates.*' => 'file|mimes:pdf,doc,docx|max:10240',
+        ]);
+
+        try {
+            $application = Application::create(
+                $request->except(['certificates', 'resume_path', 'cover_letter_path'])
+            );
+
+            if ($request->hasFile('resume')) {
+                $resumePath = $request->file('resume')->store('resumes', 'public');
+                $application->resume_path = $resumePath;
+            }
+
+            if ($request->hasFile('cover_letter')) {
+                $coverLetterPath = $request->file('cover_letter')->store('cover_letters', 'public');
+                $application->cover_letter_path = $coverLetterPath;
+            }
+
+            if ($request->has('certificates')) {
+                foreach ($request->file('certificates') as $file) {
+                    $certificatePath = $file->store('certificates', 'public');
+                    Certificate::create([
+                        'application_id' => $application->id,
+                        'file_path' => $certificatePath,
+                    ]);
+                }
+            }
+
+            $application->save();
+
+            return redirect()->route('applications.create')->with('success', $request->first_name.' '.  $request->last_name.' '.'Your Application was submitted successfully.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'There was an error processing your application. Please try again.'])->withInput();
+        }
+    }
+
+
+public function store(Request $request) {
+    $validatedData = $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'email' => 'required|string|email',
+        'phone' => 'required|string|max:20',
+        'nrc_number' => 'required|string|max:20',
+        'position_applied_for' => 'required|string|max:255',
+        'years_of_experience' => 'required|integer|min:0',
+        'resume' => 'required|file|mimes:pdf,doc,docx|max:10240',
+        'cover_letter' => 'required|file|mimes:pdf,doc,docx|max:10240',
+        'certificates' => 'nullable|array',
+        'certificates.*' => 'file|mimes:pdf,doc,docx|max:10240',
+    ]);
+
+    try {
+        // Check for duplicate applications
+        $existingApplication = Application::where('first_name', $validatedData['first_name'])
+            ->where('last_name', $validatedData['last_name'])
+            ->where('nrc_number', $validatedData['nrc_number'])
+            ->where('position_applied_for', $validatedData['position_applied_for'])
+            ->first();
+
+        if ($existingApplication) {
+            return back()->withErrors([
+                'warning' => 'You have already submitted an application for this position.',
+            ])->withInput();
+        }
+
+        // Create a new application
+        $application = Application::create(
+            $request->except(['certificates', 'resume_path', 'cover_letter_path'])
+        );
+
+        if ($request->hasFile('resume')) {
+            $resumePath = $request->file('resume')->store('resumes', 'public');
+            $application->resume_path = $resumePath;
+        }
+
+        if ($request->hasFile('cover_letter')) {
+            $coverLetterPath = $request->file('cover_letter')->store('cover_letters', 'public');
+            $application->cover_letter_path = $coverLetterPath;
+        }
+
+        if ($request->has('certificates')) {
+            foreach ($request->file('certificates') as $file) {
+                $certificatePath = $file->store('certificates', 'public');
+                Certificate::create([
+                    'application_id' => $application->id,
+                    'file_path' => $certificatePath,
+                ]);
+            }
+        }
+
+        $application->save();
+
+        return redirect()->route('applications.create')
+            ->with('success', $request->first_name . ' ' . $request->last_name . ' Your application was submitted successfully.');
+    } catch (\Exception $e) {
+        return back()->withErrors([
+            'error' => 'There was an error processing your application. Please try again.',
+        ])->withInput();
+    }
+}

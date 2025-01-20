@@ -27,6 +27,19 @@ class ApplicationController extends Controller {
         ]);
 
         try {
+
+            $existingApplication = Application::where('first_name', $validatedData['first_name'])
+                ->where('last_name', $validatedData['last_name'])
+                ->where('nrc_number', $validatedData['nrc_number'])
+                ->where('position_applied_for', $validatedData['position_applied_for'])
+                ->first();
+
+            if ($existingApplication) {
+                return back()->withErrors([
+                    'warning' => 'You have already submitted an application for this position.Please click the button above to track the status of your application',
+                ])->withInput();
+            }
+
             $application = Application::create(
                 $request->except(['certificates', 'resume_path', 'cover_letter_path'])
             );
@@ -53,9 +66,12 @@ class ApplicationController extends Controller {
 
             $application->save();
 
-            return redirect()->route('applications.create')->with('success', $request->first_name.' '.  $request->last_name.' '.'Your Application was submitted successfully.');
+            return redirect()->route('applications.create')
+                ->with('success', $request->first_name . ' ' . $request->last_name . ' Your application was submitted successfully.');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'There was an error processing your application. Please try again.'])->withInput();
+            return back()->withErrors([
+                'error' => 'There was an error processing your application. Please try again.',
+            ])->withInput();
         }
     }
 
@@ -89,13 +105,13 @@ class ApplicationController extends Controller {
             'nrc_number' => 'required|string|max:20',
         ]);
 
-        $application = Application::where('nrc_number', $request->nrc_number)->first();
+        $applications = Application::where('nrc_number', $request->nrc_number)->get();
 
-        if (!$application) {
+        if ($applications->isEmpty()) {
             return back()->withErrors(['nrc_number' => 'No application found with this NRC number.']);
         }
 
-        return view('applications.track-status', ['application' => $application]);
+        return view('applications.track-status', ['applications' => $applications]);
     }
 
     public function show($id) {
