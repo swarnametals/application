@@ -51,6 +51,9 @@
                             <a href="{{ route('employees.show', $employee->id) }}" class="btn btn-info btn-sm">
                                 View
                             </a>
+                            <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-warning btn-sm">
+                                Edit
+                            </a>
                             <a href="{{ route('employees.generatePayslip', $employee->id) }}" class="btn btn-primary btn-sm"><i class="fas fa-print"></i>
                                 Print Payslip
                             </a>

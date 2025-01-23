@@ -26,7 +26,7 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="id_number">ID Number<span class="text-danger">*</span></label>
+                    <label for="id_number">Employee ID<span class="text-danger">*</span></label>
                     <input type="text" id="id_number" name="id_number" class="form-control" value="{{ old('id_number') }}" required>
                 </div>
             </div>
@@ -127,6 +127,7 @@
                 <div class="form-group">
                     <label for="payment_method">Payment Method<span class="text-danger">*</span></label>
                     <select id="payment_method" name="payment_method" class="form-control" required>
+                        <option value="">Select Payment Method</option>
                         <option value="Bank" {{ old('payment_method') == 'Bank' ? 'selected' : '' }}>Bank</option>
                         <option value="MTN Mobile Money" {{ old('payment_method') == 'MTN Mobile Money' ? 'selected' : '' }}>MTN Mobile Money</option>
                         <option value="Airtel Mobile Money" {{ old('payment_method') == 'Airtel Mobile Money' ? 'selected' : ''}} >Airtel Mobile Money</option>

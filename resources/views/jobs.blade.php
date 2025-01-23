@@ -449,9 +449,7 @@
 
     <p><strong>Submission Options:</strong></p>
     <ul>
-        <li>Apply online : <a href="{{ route('applications.create')}}">click here to apply online</a></li>
-        <li>Email: hr@plrprojects.com</li>
-        <li>In Person: Human Resource Department, Swarna Metals Zambia Limited, a PLR Group Company, F/4213/A, Sabina Mufulira Road, Kitwe - 50100, Copperbelt, Zambia</li>
+        <li>Apply online : <a href="{{ route('applications.create')}}">click here to apply</a></li>
     </ul>
 
     <p><strong>Application Deadline:</strong> 31st January 2025</p>
