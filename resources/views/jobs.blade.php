@@ -449,7 +449,8 @@
 
     <p><strong>Submission Options:</strong></p>
     <ul>
-        <li>Apply online : <a href="{{ route('applications.create')}}">click here to apply</a></li>
+        <li class="text-danger"><strong>Note:</strong> Only online applications will be accepted.</li>
+        <li>To apply online: <a href="{{ route('applications.create') }}">Click here to apply</a></li>
     </ul>
 
     <p><strong>Application Deadline:</strong> 31st January 2025</p>
