@@ -62,7 +62,16 @@
                         <td>{{ $application->phone }}</td>
                         <td>{{ $application->position_applied_for }}</td>
                         <td>{{ $application->years_of_experience }} Years</td>
-                        <td>{{ $application->status }}</td>
+                        <td>
+                            <span
+                                class="badge
+                                @if($application->status == 'Pending') bg-warning text-dark
+                                @elseif($application->status == 'Accepted') bg-success
+                                @elseif($application->status == 'Rejected') bg-danger
+                                @else bg-secondary @endif">
+                                {{ $application->status }}
+                            </span>
+                        </td>
                         <td>
                             <a href="{{ route('applications.show', $application->id) }}" class="btn btn-info btn-sm mb-1">View</a>
                         </td>

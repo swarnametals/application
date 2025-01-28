@@ -16,6 +16,7 @@ class Payslip extends Model {
     protected $fillable = [
         'employee_id',
         'gross_earnings',
+        'days_worked',
         'total_deductions',
         'net_pay',
         'napsa_contribution',

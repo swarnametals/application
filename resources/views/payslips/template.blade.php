@@ -149,7 +149,10 @@
                 <tr>
                     <th>Leave Balance (Days):</th>
                     <td>-</td>
-                    <td colspan="2"></td>
+                    <th>Number of Days Worked: </th>
+                    @foreach($employee->payslips as $payslip)
+                        <td> {{ $payslip->days_worked ?? '-' }}</td>
+                    @endforeach
                 </tr>
             </table>
 
@@ -168,7 +171,7 @@
                         <td>E01</td>
                         <td>Basic Pay</td>
                         <td></td>
-                        <td>{{ $employee->basic_salary }}</td>
+                        <td>{{ number_format($employee->basic_salary, 2) }}</td>
                     </tr>
                     <tr>
                         <td>E02</td>
@@ -257,13 +260,13 @@
                 <strong>Social Security Number:</strong> {{ $employee->social_security_number }}
             </p>
             <p style="display: inline-block;">
-                <strong>Bank Name:</strong> {{ $employee->bank_name }}
+                <strong>Bank Name:</strong> {{ $employee->bank_name ?? '-' }}
             </p>
             <p style="display: inline-block; margin-right: 20px;">
-                <strong>Branch Name:</strong> {{ $employee->branch_name }}
+                <strong>Branch Name:</strong> {{ $employee->branch_name ?? '-' }}
             </p>
             <p style="display: inline-block;">
-                <strong>Bank Account Number:</strong> {{ $employee->bank_account_number }}
+                <strong>Bank Account Number:</strong> {{ $employee->bank_account_number ?? '-' }}
             </p>
             <p><strong>Prepared By:</strong>........................................................................ <strong>Date:</strong>.................................................</p>
             <div class="qr-code">
@@ -338,7 +341,7 @@
                         <td>E01</td>
                         <td>Basic Pay</td>
                         <td></td>
-                        <td>{{ $employee->basic_salary }}</td>
+                        <td>{{ number_format($employee->basic_salary, 2) }}</td>
                     </tr>
                     <tr>
                         <td>E02</td>
@@ -427,13 +430,13 @@
                 <strong>Social Security Number:</strong> {{ $employee->social_security_number }}
             </p>
             <p style="display: inline-block;">
-                <strong>Bank Name:</strong> {{ $employee->bank_name }}
+                <strong>Bank Name:</strong> {{ $employee->bank_name ?? '-' }}
             </p>
             <p style="display: inline-block; margin-right: 20px;">
-                <strong>Branch Name:</strong> {{ $employee->branch_name }}
+                <strong>Branch Name:</strong> {{ $employee->branch_name ?? '-' }}
             </p>
             <p style="display: inline-block;">
-                <strong>Bank Account Number:</strong> {{ $employee->bank_account_number }}
+                <strong>Bank Account Number:</strong> {{ $employee->bank_account_number ?? '-' }}
             </p>
             <p><strong>Prepared By:</strong>........................................................................ <strong>Date:</strong>.................................................</p>
             <div class="qr-code">

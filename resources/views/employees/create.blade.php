@@ -65,44 +65,29 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="housing_allowance">Housing Allowance<span class="text-danger">*</span></label>
-                    <input type="number" id="housing_allowance" name="housing_allowance" class="form-control" value="{{ old('housing_allowance') }}" required>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="transport_allowance">Transport Allowance<span class="text-danger">*</span></label>
-                    <input type="number" id="transport_allowance" name="transport_allowance" class="form-control" value="{{ old('transport_allowance') }}" required>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="other_allowances">Other Allowances<span class="text-danger">*</span></label>
-                    <input type="number" id="other_allowances" name="other_allowances" class="form-control" value="{{ old('other_allowances') }}" required>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="lunch_allowance">Lunch Allowance<span class="text-danger">*</span></label>
-                    <input type="number" id="lunch_allowance" name="lunch_allowance" class="form-control" value="{{ old('lunch_allowance') }}" required>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
                     <label for="overtime_hours">Overtime Hours</label>
                     <input type="number" id="overtime_hours" name="overtime_hours" class="form-control" value="{{ old('overtime_hours') }}">
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-group">
+                    <label for="other_allowances">Other Allowances<span class="text-danger">*</span></label>
+                    <input type="number" id="other_allowances" name="other_allowances" class="form-control" value="{{ old('other_allowances') }}" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
                     <label for="overtime_pay">Over Time Pay</label>
                     <input type="number" id="overtime_pay" name="overtime_pay" class="form-control" value="{{ old('overtime_pay') }}">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="overtime_pay">Days Worked<span class="text-danger">*</span></label>
+                    <input type="number" id="days_worked" name="days_worked" class="form-control" value="{{ old('days_worked') ?? 26}}">
                 </div>
             </div>
         </div>

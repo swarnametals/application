@@ -121,7 +121,8 @@ class ApplicationController extends Controller {
     }
 
     public function index(Request $request) {
-        $query = Application::with('certificates');
+        $query = Application::with('certificates')
+            ->where('status', '!=', 'Rejected'); // Exclude rejected applications
 
         if ($request->years_of_experience) {
             $query->where('years_of_experience', $request->input('years_of_experience'));

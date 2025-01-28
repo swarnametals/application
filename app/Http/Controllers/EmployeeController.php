@@ -26,20 +26,22 @@ class EmployeeController extends Controller {
             'grade' => 'required|string|max:255',
             'team' => 'nullable|string|max:255',
             'basic_salary' => 'required|numeric|min:0',
-            'housing_allowance' => 'required|numeric|min:0',
-            'transport_allowance' => 'required|numeric|min:0',
             'other_allowances' => 'required|numeric|min:0',
             'overtime_hours' => 'nullable|numeric|min:0',
             'overtime_pay' => 'nullable|numeric|min:0',
-            'lunch_allowance' => 'required|numeric|min:0',
             'loan_recovery' => 'required|numeric|min:0',
             'other_deductions' => 'required|numeric|min:0',
+            'days_worked' => 'required|numeric|min:0',
             'payment_method' => 'required|string|max:255',
             'social_security_number' => 'required|string|max:255',
             'bank_name' => 'nullable|string',
             'branch_name' => 'nullable|string',
             'bank_account_number' => 'nullable|string',
         ]);
+
+        $validated['housing_allowance'] = $validated['basic_salary'] * 0.3; // 30% of basic salary
+        $validated['lunch_allowance'] = 180; // Fixed value
+        $validated['transport_allowance'] = 200; // Fixed value
 
         $employee = Employee::create($validated);
 
@@ -69,6 +71,7 @@ class EmployeeController extends Controller {
         Payslip::create([
             'employee_id' => $employee->id,
             'gross_earnings' => $grossEarnings,
+            'days_worked' => $validated['days_worked'],
             'total_deductions' => $totalDeductions,
             'net_pay' => $netPay,
             'napsa_contribution' => $napsa,
@@ -98,14 +101,12 @@ class EmployeeController extends Controller {
                 'grade' => 'required|string|max:255',
                 'team' => 'nullable|string|max:255',
                 'basic_salary' => 'required|numeric|min:0',
-                'housing_allowance' => 'required|numeric|min:0',
-                'transport_allowance' => 'required|numeric|min:0',
                 'other_allowances' => 'required|numeric|min:0',
                 'overtime_hours' => 'nullable|numeric|min:0',
                 'overtime_pay' => 'nullable|numeric|min:0',
-                'lunch_allowance' => 'required|numeric|min:0',
                 'loan_recovery' => 'required|numeric|min:0',
                 'other_deductions' => 'required|numeric|min:0',
+                'days_worked' => 'required|numeric|min:0',
                 'payment_method' => 'required|string|max:255',
                 'social_security_number' => 'required|string|max:255',
                 'bank_name' => 'nullable|string',
@@ -113,14 +114,18 @@ class EmployeeController extends Controller {
                 'bank_account_number' => 'nullable|string',
             ]);
 
+            $validated['housing_allowance'] = $validated['basic_salary'] * 0.3; // 30% of basic salary
+            $validated['lunch_allowance'] = 180; // Fixed value
+            $validated['transport_allowance'] = 200; // Fixed value
+
             $employee->update($validated);
 
             $grossEarnings = $employee->basic_salary
-                + $employee->housing_allowance
-                + $employee->transport_allowance
-                + $employee->other_allowances
-                + $employee->overtime_pay
-                + $employee->lunch_allowance;
+                + $validated['housing_allowance']
+                + $validated['transport_allowance']
+                + $validated['other_allowances']
+                + $validated['overtime_pay']
+                + $validated['lunch_allowance'];
 
             $napsa = $grossEarnings * 0.05;
             $nhima = $employee->basic_salary * 0.01;
@@ -143,6 +148,7 @@ class EmployeeController extends Controller {
             if ($payslip) {
                 $payslip->update([
                     'gross_earnings' => $grossEarnings,
+                    'days_worked' => $validated['days_worked'],
                     'total_deductions' => $totalDeductions,
                     'net_pay' => $netPay,
                     'napsa_contribution' => $napsa,
@@ -153,6 +159,7 @@ class EmployeeController extends Controller {
                 Payslip::create([
                     'employee_id' => $employee->id,
                     'gross_earnings' => $grossEarnings,
+                    'days_worked' => $validated['days_worked'],
                     'total_deductions' => $totalDeductions,
                     'net_pay' => $netPay,
                     'napsa_contribution' => $napsa,

@@ -31,11 +31,11 @@
                     <p><strong>Overtime Pay:</strong> {{ number_format($employee->overtime_pay, 2) }} ZMW</p>
                     <p><strong>Lunch Allowance:</strong> {{ number_format($employee->lunch_allowance, 2) }} ZMW</p>
                     <p><strong>Payment Method:</strong> {{ $employee->payment_method }}</p>
-                    <p><strong>Bank Account Number:</strong> {{ $employee->bank_account_number }}</p>
+                    <p><strong>Bank Account Number:</strong> {{ $employee->bank_account_number ?? '-' }}</p>
                 </div>
                 <div class="col-md-6">
-                    <p><strong>Bank Name:</strong> {{ $employee->bank_name }}</p>
-                    <p><strong>Branch Name:</strong> {{ $employee->branch_name }}</p>
+                    <p><strong>Bank Name:</strong> {{ $employee->bank_name ?? '-'}}</p>
+                    <p><strong>Branch Name:</strong> {{ $employee->branch_name ?? '-'}}</p>
                 </div>
             </div>
         </div>
@@ -54,6 +54,7 @@
                     <thead class="table-dark">
                         <tr>
                             <th>#</th>
+                            <th>Number of Days Worked</th>
                             <th>Gross Earnings</th>
                             <th>Total Deductions</th>
                             <th>Net Pay</th>
@@ -67,6 +68,7 @@
                         @foreach($employee->payslips as $payslip)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
+                                <td>{{ number_format($payslip->days_worked) }}</td>
                                 <td>{{ number_format($payslip->gross_earnings, 2) }} ZMW</td>
                                 <td>{{ number_format($payslip->total_deductions, 2) }} ZMW</td>
                                 <td>{{ number_format($payslip->net_pay, 2) }} ZMW</td>
