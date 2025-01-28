@@ -113,7 +113,7 @@
 
             <div class="mb-3">
                 <label for="certificate_1" class="form-label">Upload Certified Copies of Academic and Professional Certificates <span class="text-danger">(In one PDF Document)</span></label>
-                <input type="file" class="form-control" id="certificate_1" name="certificates[]">
+                <input type="file" class="form-control" id="certificate_1" name="certificates[]" required>
                 <small class="form-text text-muted">
                     Allowed file types: PDF, DOC, DOCX. Maximum file size: 10MB.
                 </small>
