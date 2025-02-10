@@ -187,10 +187,15 @@
         <td>Stores</td>
         <td>1</td>
         </tr>
+        <tr>
+        <td>13</td>
+        <td>Purchase Executive/Assistant</td>
+        <td>2</td>
+        </tr>
     <tr>
         <td></td>
         <td style="text-align: right; font-weight:bold;">Total</td>
-        <td style="font-weight:bold;">47</td>
+        <td style="font-weight:bold;">49</td>
         </tr>
     </tbody>
     </table>
@@ -428,7 +433,33 @@
             <li>Strong communication and coordination skills to work with cross-functional teams.</li>
         </ul>
     </div>
-    <!-- Repeat similar structure for other roles -->
+
+    <div>
+        <h3>13. Purchase Executive/Assistant</h3>
+        <p><strong>Job Description</strong></p>
+        <p>We are looking for a Purchase Executive/Assistant to join our team and assist with procurement operations. The ideal candidate will ensure timely procurement of quality materials, negotiate effectively with suppliers, and manage inventory levels to support seamless plant operations.</p>
+        <p><strong>Key Responsibilities</strong></p>
+        <ul>
+            <li>Identify and source materials, equipment, and services in line with plant requirements.</li>
+            <li>Develop and maintain relationships with local and international suppliers.</li>
+            <li>Negotiate purchase terms, pricing, and delivery schedules to ensure cost efficiency.</li>
+            <li>Ensure timely delivery of materials and resolve any procurement-related issues.</li>
+            <li>Prepare purchase orders, maintain procurement records, and ensure compliance with company policies.</li>
+            <li>Monitor inventory levels and coordinate with the store team to avoid stockouts.</li>
+            <li>Work closely with the production, R&D, and projects teams to meet procurement needs.</li>
+            <li>Ensure adherence to quality and safety standards for all procured items.</li>
+        </ul>
+        <p><strong>Qualifications Required</strong></p>
+        <ul>
+            <li>Bachelor’s degree in Supply Chain Management, Business Administration, or a related field.</li>
+            <li>2-4 years of experience in procurement, preferably in the mining or manufacturing industry.</li>
+            <li>Strong negotiation, communication, and organizational skills.</li>
+            <li>Familiarity with local and international suppliers and markets.</li>
+            <li>Knowledge of procurement software and inventory management systems.</li>
+            <li>Ability to work independently and handle multiple tasks under tight deadlines.</li>
+            <li>Proficiency in Microsoft Office Suite (Excel, Word, PowerPoint).</li>
+        </ul>
+    </div>
 
     <h3>General Requirements for All Positions</h3>
     <ul>
@@ -453,7 +484,7 @@
         <li>To apply online: <a href="{{ route('applications.create') }}">Click here to apply</a></li>
     </ul>
 
-    <p><strong>Application Deadline:</strong> 31st January 2025</p>
+    <p><strong>Application Deadline:</strong> 31st March 2025</p>
     <p><strong>Why Join Us?</strong> Be part of a dynamic team driving innovation in Zambia’s copper industry. Join us in our journey towards excellence!</p>
 
 </div>
