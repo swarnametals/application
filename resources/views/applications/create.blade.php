@@ -46,7 +46,7 @@
             </div>
 
             <div class="mb-3">
-                <label for="nrc_number" class="form-label">NRC Number</label>
+                <label for="nrc_number" class="form-label">NRC Number or Passport Number</label>
                 <input type="text" class="form-control" id="nrc_number" name="nrc_number" value="{{ old('nrc_number') }}" required>
                 @error('nrc_number') <div class="text-danger">{{ $message }}</div> @enderror
             </div>
