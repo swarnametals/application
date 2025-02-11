@@ -67,6 +67,7 @@
                     <option value="HR Officer" {{ old('position_applied_for') == 'HR Officer' ? 'selected' : '' }}>HR Officer</option>
                     <option value="Safety Officer" {{ old('position_applied_for') == 'Safety Officer' ? 'selected' : '' }}>Safety Officer</option>
                     <option value="Stores Incharge" {{ old('position_applied_for') == 'Stores Incharge' ? 'selected' : '' }}>Stores Incharge</option>
+                    <option value="Purchase Executive/Assistant" {{ old('position_applied_for') == 'Purchase Executive/Assistant' ? 'selected' : '' }}>Purchase Executive/Assistant</option>
                 </select>
                 @error('position_applied_for') <div class="text-danger">{{ $message }}</div> @enderror
             </div>

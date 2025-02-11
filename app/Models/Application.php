@@ -5,17 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Application extends Model
-{
+class Application extends Model {
     use HasFactory;
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
      */
     protected $fillable = [
         'user_id',
+        'application_id',
         'first_name',
         'last_name',
         'email',
@@ -28,6 +26,28 @@ class Application extends Model
         'cover_letter_path',
         'submitted_at',
     ];
+
+    protected static function boot() {
+        parent::boot();
+
+        static::creating(function ($application) {
+            if (empty($application->application_id)) {
+                $application->application_id = self::generateUniqueApplicationId();
+            }
+        });
+    }
+
+    /**
+     * Generate a unique numeric application ID
+     */
+    private static function generateUniqueApplicationId()
+    {
+        do {
+            $id = mt_rand(1000000000, 9999999999); // Generate a 10-digit number
+        } while (self::where('application_id', $id)->exists());
+
+        return $id;
+    }
 
     /**
      * Relationships

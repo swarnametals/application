@@ -28,7 +28,7 @@
                 <label for="position_applied_for" class="form-label">Position Applied For</label>
                 <select class="form-control" id="position_applied_for" name="position_applied_for" onchange="this.form.submit()">
                     <option value="">All</option>
-                    @foreach(['Crushing Section In-charge', 'Milling and Concentrator Section In-charge', 'Leaching and PLS Dam Section In-charge', 'Solvent Extraction Section In-charge', 'Electrowinning Section In-charge', 'Electrical Maintenance In-charge', 'Mechanical Maintenance In-charge', 'Laboratory In-charge', 'Garage In-charge', 'HR Officer', 'Safety Officer', 'Stores Incharge'] as $position)
+                    @foreach(['Crushing Section In-charge', 'Milling and Concentrator Section In-charge', 'Leaching and PLS Dam Section In-charge', 'Solvent Extraction Section In-charge', 'Electrowinning Section In-charge', 'Electrical Maintenance In-charge', 'Mechanical Maintenance In-charge', 'Laboratory In-charge', 'Garage In-charge', 'HR Officer', 'Safety Officer', 'Stores Incharge','Purchase Executive/Assistant'] as $position)
                         <option value="{{ $position }}" {{ request('position_applied_for') == $position ? 'selected' : '' }}>{{ $position }}</option>
                     @endforeach
                 </select>
@@ -45,6 +45,7 @@
         <table class="table table-striped">
             <thead>
                 <tr>
+                    {{-- <th>Application ID</th> --}}
                     <th>Name</th>
                     <th>Email</th>
                     <th>Phone</th>
@@ -57,6 +58,7 @@
             <tbody>
                 @foreach($applications as $application)
                     <tr>
+                        {{-- <td>{{ $application->application_id }}</td> --}}
                         <td>{{ $application->first_name }} {{ $application->last_name }}</td>
                         <td>{{ $application->email }}</td>
                         <td>{{ $application->phone }}</td>

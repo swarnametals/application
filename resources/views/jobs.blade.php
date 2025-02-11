@@ -214,6 +214,9 @@
             <li>Minimum of 5 years of experience in ore crushing operations.</li>
             <li>Strong understanding of crushing machinery and safety protocols.</li>
         </ul>
+        <ul>
+            <li>To submit your application, please <a href="{{ route('applications.create') }}">click here</a>.</li>
+        </ul>
     </div>
 
     <div>
@@ -229,6 +232,9 @@
             <li>Minimum of 5 years of hands-on experience in milling and flotation operations within the mining or mineral processing sector.</li>
             <li>Strong leadership skills with a focus on efficiency and safety.</li>
         </ul>
+        <ul>
+            <li>To submit your application, please <a href="{{ route('applications.create') }}">click here</a>.</li>
+        </ul>
     </div>
 
     <div>
@@ -242,6 +248,9 @@
             <li>Bachelor’s Degree in Metallurgy, Chemical Engineering, or a related discipline.</li>
             <li>At least 5 years of experience in leaching operations within a hydrometallurgical setting.</li>
             <li>Strong knowledge of PLS management and copper extraction chemistry.</li>
+        </ul>
+        <ul>
+            <li>To submit your application, please <a href="{{ route('applications.create') }}">click here</a>.</li>
         </ul>
     </div>
 
@@ -257,6 +266,9 @@
             <li>Minimum of 5 years of relevant experience in solvent extraction operations, preferably in the mining industry.</li>
             <li>Proficiency in SX plant operation, chemical handling, and troubleshooting.</li>
         </ul>
+        <ul>
+            <li>To submit your application, please <a href="{{ route('applications.create') }}">click here</a>.</li>
+        </ul>
     </div>
 
     <div>
@@ -270,6 +282,9 @@
             <li>Bachelor’s Degree in Metallurgy, Electrical Engineering, or Process Engineering.</li>
             <li>Minimum of 5 years of experience in electrowinning processes.</li>
             <li>Essential knowledge of electrode and cathode production processes.</li>
+        </ul>
+        <ul>
+            <li>To submit your application, please <a href="{{ route('applications.create') }}">click here</a>.</li>
         </ul>
     </div>
 
@@ -286,6 +301,9 @@
             <li>Minimum of 5 years of experience in electrical maintenance, preferably in the mining or industrial sector.</li>
             <li>Strong knowledge of electrical systems in mining and processing plants.</li>
         </ul>
+        <ul>
+            <li>To submit your application, please <a href="{{ route('applications.create') }}">click here</a>.</li>
+        </ul>
     </div>
 
     <div>
@@ -300,6 +318,9 @@
             <li>Minimum of 5 years of experience in maintenance within the mining or industrial processing sector.</li>
             <li>Strong knowledge of mechanical systems, maintenance planning, and problem-solving.</li>
         </ul>
+        <ul>
+            <li>To submit your application, please <a href="{{ route('applications.create') }}">click here</a>.</li>
+        </ul>
     </div>
 
     <div>
@@ -312,6 +333,9 @@
             <li>Bachelor’s Degree in Chemistry, Metallurgy, or a related field.</li>
             <li>Minimum of 5 years of experience in laboratory management within the mining or mineral processing industry.</li>
             <li>Strong understanding of analytical techniques and quality control.</li>
+        </ul>
+        <ul>
+            <li>To submit your application, please <a href="{{ route('applications.create') }}">click here</a>.</li>
         </ul>
     </div>
 
@@ -354,6 +378,9 @@
             <li>Understanding of workplace health and safety standards.</li>
             <li>Ability to work in a team-oriented environment.</li>
         </ul>
+        <ul>
+            <li>To submit your application, please <a href="{{ route('applications.create') }}">click here</a>.</li>
+        </ul>
     </div>
 
     <div>
@@ -379,6 +406,9 @@
             <li>Excellent interpersonal and communication skills with the ability to manage diverse teams.</li>
             <li>Proven experience in handling employee grievances and fostering a positive work environment.</li>
             <li>Proficiency in HRMS software and MS Office applications.</li>
+        </ul>
+        <ul>
+            <li>To submit your application, please <a href="{{ route('applications.create') }}">click here</a>.</li>
         </ul>
     </div>
 
@@ -406,6 +436,9 @@
             <li>Strong analytical and problem-solving skills to assess risks and develop solutions.</li>
             <li>Proficiency in preparing safety reports and conducting safety training programs.</li>
         </ul>
+        <ul>
+            <li>To submit your application, please <a href="{{ route('applications.create') }}">click here</a>.</li>
+        </ul>
     </div>
 
     <div>
@@ -431,6 +464,9 @@
             <li>Familiarity with ERP systems or inventory management software.</li>
             <li>Excellent organizational and multitasking skills.</li>
             <li>Strong communication and coordination skills to work with cross-functional teams.</li>
+        </ul>
+        <ul>
+            <li>To submit your application, please <a href="{{ route('applications.create') }}">click here</a>.</li>
         </ul>
     </div>
 
@@ -459,6 +495,9 @@
             <li>Ability to work independently and handle multiple tasks under tight deadlines.</li>
             <li>Proficiency in Microsoft Office Suite (Excel, Word, PowerPoint).</li>
         </ul>
+        <ul>
+            <li>To submit your application, please <a href="{{ route('applications.create') }}">click here</a>.</li>
+        </ul>
     </div>
 
     <h3>General Requirements for All Positions</h3>
@@ -481,7 +520,7 @@
     <p><strong>Submission Options:</strong></p>
     <ul>
         <li class="text-danger"><strong>Note:</strong> Only online applications will be accepted.</li>
-        <li>To apply online: <a href="{{ route('applications.create') }}">Click here to apply</a></li>
+        <li>To submit your application, please <a href="{{ route('applications.create') }}">click here</a>.</li>
     </ul>
 
     <p><strong>Application Deadline:</strong> 31st March 2025</p>
