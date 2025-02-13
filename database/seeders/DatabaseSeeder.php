@@ -17,5 +17,8 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
+
+        // Call the VehicleLogSeeder
+        $this->call(VehicleLogSeeder::class);
     }
 }

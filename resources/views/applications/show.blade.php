@@ -15,7 +15,7 @@
             <p><strong>Application Status:</strong> {{ $application->status }}</p>
             <p><strong>Email:</strong> {{ $application->email }}</p>
             <p><strong>Phone:</strong> {{ $application->phone }}</p>
-            <p><strong>NRC Number:</strong> {{ $application->nrc_number }}</p>
+            <p><strong>NRC Number/ Passport Number:</strong> {{ $application->nrc_number }}</p>
             <p><strong>Position Applied For:</strong> {{ $application->position_applied_for }}</p>
             <p><strong>Years of Experience:</strong> {{ $application->years_of_experience }} Year{{ $application->years_of_experience > 1 ? 's' : '' }}</p>
 

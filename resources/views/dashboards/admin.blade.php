@@ -25,8 +25,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="{{ route('not-implemented-yet') }}">
-                        <i class="fas fa-chart-line"></i> Production Rate
+                    <a class="nav-link text-white" href="{{ route('vehicles.index') }}">
+                        <i class="fas fa-truck"></i> Transportation and <i class="fas fa-gas-pump"></i> Fuel
                     </a>
                 </li>
                 <li class="nav-item">
@@ -42,11 +42,6 @@
                 <li class="nav-item">
                     <a class="nav-link text-white" href="{{ route('not-implemented-yet') }}">
                         <i class="fas fa-shipping-fast"></i> Shipments
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="{{ route('not-implemented-yet') }}">
-                        <i class="fas fa-chart-bar"></i> Reports
                     </a>
                 </li>
                 <li class="nav-item">
@@ -78,7 +73,7 @@
                                 <i class="fas fa-users"></i> Active Employees
                             </h5>
                             <p class="card-text h4">{{ $employeesTotal }}</p>
-                            <a href="{{ route('employees.index') }}" class="btn btn-light btn-sm">Manage Employees</a>
+                            <a href="{{ route('employees.index') }}" class="btn btn-light btn-sm">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -86,7 +81,7 @@
                     <div class="card text-white bg-primary">
                         <div class="card-body">
                             <h5 class="card-title">
-                                <i class="fas fa-file-alt"></i> Total Applications
+                                <i class="fas fa-file-alt"></i> Job Applications
                             </h5>
                             <p class="card-text h4">{{ $applicationsTotal }}</p>
                             <a href="{{ route('applications.index') }}" class="btn btn-light btn-sm">View Details</a>
@@ -94,24 +89,24 @@
                     </div>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <div class="card text-white bg-warning">
+                    <div class="card text-white" style="background-color:brown;">
                         <div class="card-body">
                             <h5 class="card-title">
-                                <i class="fas fa-chart-line"></i> Production Rate
+                                <i class="fas fa-truck"></i> Transportation and <i class="fas fa-gas-pump"></i> Fuel
                             </h5>
-                            <p class="card-text h4">85%</p>
-                            <a href="{{ route('not-implemented-yet') }}" class="btn btn-light btn-sm">View Reports</a>
+                            <p class="card-text h4">{{ $vehiclesTotal }} Vehicles</p>
+                            <a href="{{ route('vehicles.index') }}" class="btn btn-light btn-sm">View Details</a>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <div class="card text-white bg-secondary">
+                    <div class="card text-white" style="background-color: #510404;">
                         <div class="card-body">
                             <h5 class="card-title">
                                 <i class="fas fa-truck-loading"></i> Copper Ore Purchases
                             </h5>
                             <p class="card-text h4">70 000 tonnes</p>
-                            <a href="{{ route('not-implemented-yet') }}" class="btn btn-light btn-sm">View Reports</a>
+                            <a href="{{ route('not-implemented-yet') }}" class="btn btn-light btn-sm">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -122,7 +117,7 @@
                                 <i class="fas fa-warehouse"></i> Warehouse/Inventory
                             </h5>
                             <p class="card-text h4">1345</p>
-                            <a href="{{ route('not-implemented-yet') }}" class="btn btn-light btn-sm">Track Inventory</a>
+                            <a href="{{ route('not-implemented-yet') }}" class="btn btn-light btn-sm">View Details</a>
                         </div>
                     </div>
                 </div>

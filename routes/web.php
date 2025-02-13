@@ -6,6 +6,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\PayslipController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\FuelLogController;
+use App\Http\Controllers\VehicleLogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -84,6 +87,35 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
 
     Route::get('/employees/{employee}/payslip', [EmployeeController::class, 'generatePayslip'])->name('employees.generatePayslip');
+
+    // ----------------------------Vehicle and Fuel Management--------------------------------------------
+    Route::post('/change-password', [UserController::class, 'changePassword'])->name('change-password');
+
+    Route::resource('vehicles', VehicleController::class);
+
+    Route::post('/fuel-logs/store', [FuelLogController::class, 'store'])->name('fuel_logs.store');
+
+    Route::get('/vehicle-logs', [VehicleLogController::class, 'index'])->name('vehicle_logs.index');
+    // get vehicle last log
+    Route::get('/vehicle-logs/last-trip/{vehicleId}', [VehicleLogController::class, 'getLastTripEndKilometers']);
+
+    Route::get('/vehicle-logs/create/{vehicle}', [VehicleLogController::class, 'create'])->name('vehicle_logs.create');
+
+    Route::post('/vehicle-logs', [VehicleLogController::class, 'store'])->name('vehicle_logs.store');
+
+    Route::get('/vehicle-logs/{vehicleLog}', [VehicleLogController::class, 'show'])->name('vehicle_logs.show');
+
+    Route::get('/vehicle-logs/{vehicleLog}/edit', [VehicleLogController::class, 'edit'])->name('vehicle_logs.edit');
+
+    Route::put('/vehicle-logs/{vehicleLog}', [VehicleLogController::class, 'update'])->name('vehicle_logs.update');
+
+    Route::delete('/vehicle-logs/{vehicleLog}', [VehicleLogController::class, 'destroy'])->name('vehicle_logs.destroy');
+
+    Route::get('/reports-type/{vehicle}', [VehicleController::class, 'reportType'])->name('reports.type');
+
+    Route::post('/reports/generate', [VehicleController::class, 'generate'])->name('reports.generate');
+
+    Route::post('/reports/generate-all', [VehicleController::class, 'generateAll'])->name('reports.generate_all');
 
     Route::get('/not-implemented-yet', function () {
         return view('not-implemented-yet');
