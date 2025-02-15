@@ -25,12 +25,17 @@
     <h2 class="mb-4">Vehicle: {{ $vehicle->registration_number }} | Vehicle Type: {{ $vehicle->vehicle_type }} | Driver: {{ $vehicle->driver ?? '-' }}</h2>
 
     <div class="d-flex flex-column flex-md-row gap-2 mb-3">
-        {{-- <a href="{{ route('vehicle_logs.create', $vehicle->id) }}" class="btn add" style="background-color:#510404; color: #fff;">Add Vehicle Trip</a> --}}
+        <a href="{{ route('vehicle_logs.create', $vehicle->id) }}" class="btn add" style="background-color:#510404; color: #fff;">
+            <i class="fas fa-plus-circle"></i> Add Vehicle Trip
+        </a>
         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#reportModal">
-            Generate Vehicle Report
+            <i class="fas fa-file-alt"></i> Generate Vehicle Report
         </button>
-        <a href="{{ route('vehicles.index') }}" class="btn btn-secondary">Back</a>
+        <a href="{{ route('vehicles.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
     </div>
+
 
     <h2 class="mt-4">Vehicle Trips</h2>
 
@@ -163,7 +168,7 @@
                         <input type="text" name="refuel_location" id="refuel_location" class="form-control" placeholder="Example: MT Meru Kitwe, Site">
                     </div>
 
-                    <button type="submit" class="btn btn-success">Save Fuel Log</button>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save Fuel Log</button>
                 </form>
             </div>
         </div>

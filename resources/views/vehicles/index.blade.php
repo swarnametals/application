@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container">
-    <a href="{{ route('dashboards.admin') }}" class="btn btn-secondary mb-4">Back to Dashboard</a>
+    <a href="{{ route('dashboards.admin') }}" class="btn btn-secondary mb-4"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
     <h2 class="mb-4">Vehicles List</h2>
 
     @if ($errors->any())
@@ -23,9 +23,11 @@
         </div>
     @endif
 
-    <a href="{{ route('vehicles.create') }}" class="btn mb-3" style="background-color:#510404; color: #fff;">Register Vehicle</a>
+   <a href="{{ route('vehicles.create') }}" class="btn mb-3" style="background-color:#510404; color: #fff;">
+        <i class="fas fa-truck"></i> Register Vehicle
+    </a>
     <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#reportModal">
-        Generate Report For all Vehicles
+        <i class="fas fa-file-alt"></i> Generate Report For All Vehicles
     </button>
 
     <!-- Search Form Later Update-->
@@ -45,9 +47,9 @@
 
     <!-- Dropdown to select vehicle -->
     <div class="mb-3">
-        <label for="vehicleSelect" class="form-label">Select a Vehicle:</label>
+        <label for="vehicleSelect" class="form-label">Select a Vehicle to Register a Trip:</label>
         <select id="vehicleSelect" class="form-select">
-            <option value="">Select a Vehicle</option>
+            <option value="">Select a Vehicle to Register a Trip</option>
             @foreach($vehicles as $vehicle)
                 <option value="{{ $vehicle->id }}">{{ $vehicle->registration_number }}</option>
             @endforeach
@@ -228,8 +230,8 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" id="btn_close" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success">Save Vehicle Trip & Fuel Log</button>
+                        <button type="button" class="btn btn-secondary" id="btn_close" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cancel</button>
+                        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save Vehicle Trip & Fuel Log</button>
                     </div>
                 </form>
             </div>

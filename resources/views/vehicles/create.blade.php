@@ -49,8 +49,8 @@
             <label for="driver" class="form-label">Driver</label>
             <input type="text" name="driver" class="form-control" >
         </div>
-        <button type="submit" class="btn btn-success">Save</button>
-        <a href="{{ route('vehicles.index') }}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save</button>
+        <a href="{{ route('vehicles.index') }}" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</a>
     </form>
 </div>
 

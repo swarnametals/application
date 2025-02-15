@@ -43,7 +43,14 @@ class VehicleLogController extends Controller {
                 return redirect()->route('vehicle_logs.index')->with('error', 'Vehicle not found.');
             }
 
-            return view('vehicle_logs.create', compact('vehicle'));
+            // Fetch the last trip's end kilometers
+            $lastTrip = VehicleLog::where('vehicle_id', $vehicle->id)
+                ->orderBy('departure_date', 'desc')
+                ->first();
+
+            $lastEndKilometers = $lastTrip ? $lastTrip->end_kilometers : 0;
+
+            return view('vehicle_logs.create', compact('vehicle', 'lastEndKilometers'));
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Failed to load the create log form.');
         }

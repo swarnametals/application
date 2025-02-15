@@ -5,6 +5,7 @@
 @section('content')
 <div class="container">
     <h2 class="mb-4">Add Trip Information for Vehicle: {{ $vehicle->registration_number }}</h2>
+
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul>
@@ -20,10 +21,13 @@
             {{ session('error') }}
         </div>
     @endif
+
     <small class="text-danger">Inputs marked with an asterisk (<span class="text-danger"> * </span>) are mandatory</small>
+
     <form action="{{ route('vehicle_logs.store') }}" method="POST">
         @csrf
         <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
+
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="departure_date" class="form-label">Departure Date <span class="text-danger">*</span></label>
@@ -31,14 +35,15 @@
             </div>
             <div class="col-md-6">
                 <label for="return_date" class="form-label">Return Date</label>
-                <input type="date" name="return_date" class="form-control" >
+                <input type="date" name="return_date" class="form-control">
             </div>
         </div>
 
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="start_kilometers" class="form-label">Start Kilometers<span class="text-danger">*</span></label>
-                <input type="number" name="start_kilometers" class="form-control" placeholder="example: 54666" required>
+                <input type="number" name="start_kilometers" id="start_kilometers" class="form-control"
+                       placeholder="example: 54666" value="{{ $lastEndKilometers }}" required readonly>
             </div>
             <div class="col-md-6">
                 <label for="end_kilometers" class="form-label">Close Kilometers</label>
@@ -78,8 +83,13 @@
             <input type="text" name="refuel_location" class="form-control" placeholder="example: SITE, KALULUSHI STATION, CHIMWEMWE STATION ...">
         </div>
 
-        <button type="submit" class="btn btn-success">Save Vehicle Trip & Fuel Log</button>
-        <a href="{{ route('vehicles.show', $vehicle->id) }}" class="btn btn-secondary">Cancel</a>
+        <a href="{{ route('vehicles.show', $vehicle->id) }}" class="btn btn-secondary">
+            <i class="fas fa-times"></i> Cancel
+        </a>
+        <button type="submit" class="btn btn-success">
+            <i class="fas fa-save"></i> Save Vehicle Trip & Fuel Log
+        </button>
+
     </form>
 </div>
 @endsection
