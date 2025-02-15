@@ -23,7 +23,7 @@ class VehicleLogController extends Controller {
         try {
             // Fetch the last trip for the selected vehicle
             $lastTrip = VehicleLog::where('vehicle_id', $vehicleId)
-                ->orderBy('created_at', 'desc')
+                ->orderBy('departure_date', 'desc')
                 ->first();
 
             // Return the last trip's end_kilometers or 0 if no trips exist
