@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -10,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('fuel_logs', function (Blueprint $table) {
+        Schema::create('fuels', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('vehicle_log_id')->constrained('vehicle_logs')->onDelete('cascade');
+            $table->foreignId('trip_id')->nullable()->constrained('trips')->onDelete('set null');
+            $table->foreignId('machinery_usage_id')->nullable()->constrained('machinery_usages')->onDelete('set null');
             $table->decimal('litres_added', 8, 2);
-            $table->string('refuel_location')->nullable();
+            $table->string('refuel_location');
             $table->timestamps();
         });
     }
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('fuel_logs');
+        Schema::dropIfExists('fuels');
     }
 };

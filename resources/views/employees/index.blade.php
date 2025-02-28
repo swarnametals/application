@@ -31,8 +31,8 @@
                     <th>#</th>
                     <th>Name</th>
                     <th>ID Number</th>
-                    <th>Position</th>
-                    <th>Team</th>
+                    <th>Designation</th>
+                    <th>Department</th>
                     <th>Basic Pay</th>
                     <th>Actions</th>
                 </tr>
@@ -41,22 +41,22 @@
             @foreach($employees as $employee)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $employee->name }}</td>
-                    <td>{{ $employee->id_number }}</td>
-                    <td>{{ $employee->position }}</td>
-                    <td>{{ $employee->team }}</td>
+                    <td>{{ $employee->employee_full_name }}</td>
+                    <td>{{ $employee->employee_id }}</td>
+                    <td>{{ $employee->designation }}</td>
+                    <td>{{ $employee->department }}</td>
                     <td>{{ number_format($employee->basic_salary, 2) }}</td>
                     <td>
                         <div class="d-flex gap-2">
                             <a href="{{ route('employees.show', $employee->id) }}" class="btn btn-info btn-sm">
-                                View
+                                View Details
                             </a>
                             <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-warning btn-sm">
                                 Edit
                             </a>
-                            <a href="{{ route('employees.generatePayslip', $employee->id) }}" class="btn btn-primary btn-sm"><i class="fas fa-print"></i>
+                            {{-- <a href="{{ route('employees.generatePayslip', $employee->id) }}" class="btn btn-primary btn-sm"><i class="fas fa-print"></i>
                                 Print Payslip
-                            </a>
+                            </a> --}}
                         </div>
                     </td>
                 </tr>

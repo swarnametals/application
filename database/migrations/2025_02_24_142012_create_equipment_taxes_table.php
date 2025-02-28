@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('overtimes', function (Blueprint $table) {
+        Schema::create('equipment_taxes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id')->constrained('employees')->onDelete('cascade');
-            $table->decimal('overtime_hours', 10, 2)->nullable();
-            $table->decimal('overtime_pay', 10, 2)->nullable();
-            $table->string('month')->nullable();
+            $table->foreignId('equipment_id')->constrained('equipments')->onDelete('cascade');
+            $table->string('name');
+            $table->decimal('cost', 10, 2);
+            $table->date('expiry_date');
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('overtimes');
+        Schema::dropIfExists('equipment_taxes');
     }
 };

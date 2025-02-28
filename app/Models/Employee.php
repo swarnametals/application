@@ -5,7 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Employee extends Model {
+class Employee extends Model
+{
     use HasFactory;
 
     /**
@@ -13,27 +14,35 @@ class Employee extends Model {
      *
      * @var array
      */
-
     protected $fillable = [
-        'name',
-        'id_number',
-        'position',
+        'user_id',
+        'employee_full_name',
+        'phone_number',
+        'email',
+        'address',
+        'nationality',
+        'date_of_joining',
+        'employee_id',
+        'tpin_number',
+        'nrc_or_passport_number',
+        'designation',
+        'department',
         'grade',
-        'team',
         'basic_salary',
         'housing_allowance',
         'transport_allowance',
         'other_allowances',
-        'lunch_allowance',
-        'loan_recovery',
-        'other_deductions',
-        'overtime_hours',
-        'overtime_pay',
+        'food_allowance',
+        'references',
         'payment_method',
         'social_security_number',
-        'bank_account_number',
+        'account_name',
+        'ifsc_code',
         'bank_name',
         'branch_name',
+        'bank_address',
+        'bank_telephone_number',
+        'bank_account_number',
     ];
 
     /**
@@ -42,22 +51,36 @@ class Employee extends Model {
      * @var array
      */
     protected $casts = [
-        'basic_salary' => 'float',
-        'housing_allowance' => 'float',
-        'transport_allowance' => 'float',
-        'other_allowances' => 'float',
-        'lunch_allowance' => 'float',
-        'overtime_hours' => 'float',
-        'overtime_pay' => 'float',
-        'loan_recovery' => 'float',
-        'other_deductions' => 'float',
+        'basic_salary' => 'decimal:2',
+        'housing_allowance' => 'decimal:2',
+        'transport_allowance' => 'decimal:2',
+        'other_allowances' => 'decimal:2',
+        'food_allowance' => 'decimal:2',
+        'references' => 'array', // Cast JSON field to array
     ];
 
-    public function payslips() {
+    public function payslips()
+    {
         return $this->hasMany(Payslip::class, 'employee_id');
     }
 
-    public function overtimes() {
+    public function overtimes()
+    {
         return $this->hasMany(Overtime::class, 'employee_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function tripsAsDriver()
+    {
+        return $this->hasMany(Trip::class, 'driver_id');
+    }
+
+    public function machineryUsagesAsOperator()
+    {
+        return $this->hasMany(MachineryUsage::class, 'operator_id');
     }
 }

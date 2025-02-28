@@ -24,18 +24,28 @@
             </div>
 
             <!-- Position Applied For Filter -->
+            <!-- Position Applied For Filter -->
             <div class="col-12 col-md-4">
                 <label for="position_applied_for" class="form-label">Position Applied For</label>
                 <select class="form-control" id="position_applied_for" name="position_applied_for" onchange="this.form.submit()">
                     <option value="">All</option>
-                    @foreach(['Crushing Section In-charge', 'Milling and Concentrator Section In-charge', 'Leaching and PLS Dam Section In-charge', 'Solvent Extraction Section In-charge', 'Electrowinning Section In-charge', 'Electrical Maintenance In-charge', 'Mechanical Maintenance In-charge', 'Laboratory In-charge', 'Garage In-charge', 'HR Officer', 'Safety Officer', 'Stores Incharge','Purchase Executive/Assistant'] as $position)
+                    @foreach([
+                        'Crusher Operator',
+                        'Milling and Flotation Operator',
+                        'Metallurgist',
+                        'Leaching, Solvent Extraction and Electrowinning Operator/Attendee',
+                        'Leaching, Solvent Extraction and Electrowinning Incharge',
+                        'Plastician/Plastic Welder',
+                        'Mechanical Fitter',
+                        'Coded Welder',
+                        'Electrician',
+                        'HR Assistant Officer',
+                        'Safety Officer',
+                        'Chemist'
+                    ] as $position)
                         <option value="{{ $position }}" {{ request('position_applied_for') == $position ? 'selected' : '' }}>{{ $position }}</option>
                     @endforeach
                 </select>
-            </div>
-
-            <div class="col-12 col-md-4 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary w-100">Filter</button>
             </div>
         </div>
     </form>

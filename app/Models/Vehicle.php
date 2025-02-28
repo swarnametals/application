@@ -14,8 +14,11 @@ class Vehicle extends Model
         'driver',
     ];
 
-    public function vehicleLogs()
-    {
+    public function vehicleLogs() {
         return $this->hasMany(VehicleLog::class);
+    }
+
+    public function latestVehicleLog() {
+        return $this->hasOne(VehicleLog::class)->latest('departure_date');
     }
 }

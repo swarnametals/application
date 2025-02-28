@@ -20,6 +20,7 @@ use PhpOffice\PhpSpreadsheet\Style\Font;
 
 
 class VehicleController extends Controller {
+
     public function index(Request $request) {
         try {
             $query = Vehicle::query();
@@ -32,7 +33,8 @@ class VehicleController extends Controller {
                     ->orWhere('driver', 'LIKE', "%{$search}%");
             }
 
-            $vehicles = $query->orderBy('created_at', 'desc')->get();
+            // Eager load latest vehicle log
+            $vehicles = $query->with('latestVehicleLog')->orderBy('created_at', 'desc')->get();
 
             return view('vehicles.index', compact('vehicles', 'search'));
         } catch (Exception $e) {

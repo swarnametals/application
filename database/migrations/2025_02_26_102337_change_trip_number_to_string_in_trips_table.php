@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('payslips', function (Blueprint $table) {
-            $table->integer('days_worked')->default(26)->after('gross_earnings');
+        Schema::table('trips', function (Blueprint $table) {
+            $table->string('trip_number', 15)->change(); // Change to string, 15 chars, unique
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('payslips', function (Blueprint $table) {
-            $table->dropColumn('days_worked');
+        Schema::table('trips', function (Blueprint $table) {
+            $table->integer('trip_number')->change(); // Revert to integer (note: this may lose data)
         });
     }
 };

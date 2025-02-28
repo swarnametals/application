@@ -9,6 +9,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\FuelLogController;
 use App\Http\Controllers\VehicleLogController;
+use App\Http\Controllers\EquipmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,8 +34,8 @@ Route::get('/products-and-services', function () {
     return view('products-and-services');
 });
 
-Route::get('/jobs', function () {
-    return view('jobs');
+Route::get('/careers', function () {
+    return view('careers');
 });
 
 Route::get('/about-plr-zambia', function () {
@@ -91,7 +92,26 @@ Route::middleware(['auth'])->group(function () {
     // ----------------------------Vehicle and Fuel Management--------------------------------------------
     Route::post('/change-password', [UserController::class, 'changePassword'])->name('change-password');
 
-    Route::resource('vehicles', VehicleController::class);
+    // -----------------------Trip-related routes managed by EquipmentController---------------------------------------
+    Route::resource('equipments', EquipmentController::class);
+
+    Route::get('/trips', [EquipmentController::class, 'indexTrips'])->name('trips.index');
+    // Get the last trip's end kilometers for an equipment
+    Route::get('/trips/last-trip/{equipmentId}', [EquipmentController::class, 'getLastTripEndKilometers']);
+
+    Route::get('/trips/create/{equipment}', [EquipmentController::class, 'createTrip'])->name('trips.create');
+
+    Route::post('/trips', [EquipmentController::class, 'storeTrip'])->name('trips.store');
+
+    Route::get('/trips/{trip}', [EquipmentController::class, 'showTrip'])->name('trips.show');
+
+    Route::get('/trips/{trip}/edit', [EquipmentController::class, 'editTrip'])->name('trips.edit');
+
+    Route::put('/trips/{trip}', [EquipmentController::class, 'updateTrip'])->name('trips.update');
+
+    Route::delete('/trips/{trip}', [EquipmentController::class, 'destroyTrip'])->name('trips.destroy');
+
+    Route::post('/fuels/store', [FuelLogController::class, 'store'])->name('fuels.store');
 
     Route::post('/fuel-logs/store', [FuelLogController::class, 'store'])->name('fuel_logs.store');
 

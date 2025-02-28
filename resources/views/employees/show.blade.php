@@ -14,22 +14,22 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6">
-                    <p><strong>Name:</strong> {{ $employee->name }}</p>
-                    <p><strong>ID Number:</strong> {{ $employee->id_number }}</p>
-                    <p><strong>Position:</strong> {{ $employee->position }}</p>
+                    <p><strong>Name:</strong> {{ $employee->employee_full_name }}</p>
+                    <p><strong>ID Number:</strong> {{ $employee->employee_id }}</p>
+                    <p><strong>Designation:</strong> {{ $employee->designation }}</p>
                     <p><strong>Grade:</strong> {{ $employee->grade }}</p>
-                    <p><strong>Team:</strong> {{ $employee->team }}</p>
+                    <p><strong>Department:</strong> {{ $employee->department }}</p>
                 </div>
                 <div class="col-md-6">
                     <p><strong>Basic Salary:</strong> {{ number_format($employee->basic_salary, 2) }} ZMW</p>
                     <p><strong>Housing Allowance:</strong> {{ number_format($employee->housing_allowance, 2) }} ZMW</p>
                     <p><strong>Transport Allowance:</strong> {{ number_format($employee->transport_allowance, 2) }} ZMW</p>
+                    <p><strong>Food Allowance:</strong> {{ number_format($employee->food_allowance, 2) }} ZMW</p>
                     <p><strong>Other Allowances:</strong> {{ number_format($employee->other_allowances, 2) }} ZMW</p>
                     <p><strong>Overtime Hours:</strong> {{ number_format($employee->overtime_hours, 2) }}</p>
                 </div>
                 <div class="col-md-6">
                     <p><strong>Overtime Pay:</strong> {{ number_format($employee->overtime_pay, 2) }} ZMW</p>
-                    <p><strong>Lunch Allowance:</strong> {{ number_format($employee->lunch_allowance, 2) }} ZMW</p>
                     <p><strong>Payment Method:</strong> {{ $employee->payment_method }}</p>
                     <p><strong>Bank Account Number:</strong> {{ $employee->bank_account_number ?? '-' }}</p>
                 </div>
