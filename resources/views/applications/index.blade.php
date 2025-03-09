@@ -24,27 +24,22 @@
             </div>
 
             <!-- Position Applied For Filter -->
-            <!-- Position Applied For Filter -->
             <div class="col-12 col-md-4">
-                <label for="position_applied_for" class="form-label">Position Applied For</label>
+                <label for="position_applied_for" class="form-label">Position</label>
                 <select class="form-control" id="position_applied_for" name="position_applied_for" onchange="this.form.submit()">
                     <option value="">All</option>
-                    @foreach([
-                        'Crusher Operator',
-                        'Milling and Flotation Operator',
-                        'Metallurgist',
-                        'Leaching, Solvent Extraction and Electrowinning Operator/Attendee',
-                        'Leaching, Solvent Extraction and Electrowinning Incharge',
-                        'Plastician/Plastic Welder',
-                        'Mechanical Fitter',
-                        'Coded Welder',
-                        'Electrician',
-                        'HR Assistant Officer',
-                        'Safety Officer',
-                        'Chemist'
-                    ] as $position)
-                        <option value="{{ $position }}" {{ request('position_applied_for') == $position ? 'selected' : '' }}>{{ $position }}</option>
-                    @endforeach
+                    <option value="Crusher Operator" {{ request('position_applied_for') == 'Crusher Operator' ? 'selected' : '' }}>Crusher Operator</option>
+                    <option value="Milling and Flotation Operator" {{ request('position_applied_for') == 'Milling and Flotation Operator' ? 'selected' : '' }}>Milling and Flotation Operator</option>
+                    <option value="Metallurgist" {{ request('position_applied_for') == 'Metallurgist' ? 'selected' : '' }}>Metallurgist</option>
+                    <option value="Leaching, Solvent Extraction and Electrowinning Operator/Attendee" {{ request('position_applied_for') == 'Leaching, Solvent Extraction and Electrowinning Operator/Attendee' ? 'selected' : '' }}>Leaching, Solvent Extraction and Electrowinning Operator/Attendee</option>
+                    <option value="Leaching, Solvent Extraction and Electrowinning Incharge" {{ request('position_applied_for') == 'Leaching, Solvent Extraction and Electrowinning Incharge' ? 'selected' : '' }}>Leaching, Solvent Extraction and Electrowinning Incharge</option>
+                    <option value="Plastician/Plastic Welder" {{ request('position_applied_for') == 'Plastician/Plastic Welder' ? 'selected' : '' }}>Plastician/Plastic Welder</option>
+                    <option value="Mechanical Fitter" {{ request('position_applied_for') == 'Mechanical Fitter' ? 'selected' : '' }}>Mechanical Fitter</option>
+                    <option value="Coded Welder" {{ request('position_applied_for') == 'Coded Welder' ? 'selected' : '' }}>Coded Welder</option>
+                    <option value="Electrician" {{ request('position_applied_for') == 'Electrician' ? 'selected' : '' }}>Electrician</option>
+                    <option value="HR Assistant Officer" {{ request('position_applied_for') == 'HR Assistant Officer' ? 'selected' : '' }}>HR Assistant Officer</option>
+                    <option value="Safety Officer" {{ request('position_applied_for') == 'Safety Officer' ? 'selected' : '' }}>Safety Officer</option>
+                    <option value="Chemist" {{ request('position_applied_for') == 'Chemist' ? 'selected' : '' }}>Chemist</option>
                 </select>
             </div>
         </div>

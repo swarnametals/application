@@ -15,7 +15,7 @@
             </div>
             <ul class="nav flex-column mt-3">
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="{{ route('not-implemented-yet') }}">
+                    <a class="nav-link text-white" href="{{ route('employees.index') }}">
                         <i class="fas fa-users"></i> Employees
                     </a>
                 </li>
@@ -25,7 +25,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="{{ route('not-implemented-yet') }}">
+                    <a class="nav-link text-white" href="{{ route('equipments.index') }}">
                         <i class="fas fa-truck"></i> Transportation and <i class="fas fa-gas-pump"></i> Fuel
                     </a>
                 </li>
@@ -70,10 +70,10 @@
                     <div class="card text-white bg-success">
                         <div class="card-body">
                             <h5 class="card-title">
-                                <i class="fas fa-users"></i> Employees
+                                <i class="fas fa-users"></i>  Employees
                             </h5>
                             <p class="card-text h4">{{ $employeesTotal }}</p>
-                            <a href="{{ route('not-implemented-yet') }}" class="btn btn-light btn-sm">View Details</a>
+                            <a href="{{ route('employees.index') }}" class="btn btn-light btn-sm">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -94,8 +94,8 @@
                             <h5 class="card-title">
                                 <i class="fas fa-truck"></i> Transportation and <i class="fas fa-gas-pump"></i> Fuel
                             </h5>
-                            <p class="card-text h4">{{ $vehiclesTotal }} Vehicles</p>
-                            <a href="{{ route('not-implemented-yet') }}" class="btn btn-light btn-sm">View Details</a>
+                            <p class="card-text h4">{{ $equipmentsTotal }} Equipments/Vehicles</p>
+                            <a href="{{ route('equipments.index') }}" class="btn btn-light btn-sm">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -124,7 +124,7 @@
             </div>
 
             <!-- Chart Section -->
-            <div class="row">
+            {{-- <div class="row">
                 <div class="col-md-6 mb-3">
                     <div class="card">
                         <div class="card-body">
@@ -141,7 +141,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
         </main>
     </div>
 </div>

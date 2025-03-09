@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Jobs')
+@section('title', 'Careers')
 
 @section('content')
 <style>
@@ -87,7 +87,7 @@
         <tbody>
             <tr><td>1</td><td>Crusher Operators</td></tr>
             <tr><td>2</td><td>Milling and Flotation Operators</td></tr>
-            <tr><td>3</td><td>Metallurgists</td></tr>
+            <tr><td>3</td><td>Metallurgists-Flotation</td></tr>
             <tr><td>4</td><td>Leaching, Solvent Extraction and Electrowinning Operators/Attendees</td></tr>
             <tr><td>5</td><td>Leaching, Solvent Extraction and Electrowinning Incharge</td></tr>
             <tr><td>6</td><td>Plasticians/Plastic Welders</td></tr>
@@ -139,7 +139,7 @@
     </div>
 
     <div>
-        <h3>3. Metallurgists</h3>
+        <h3>3. Metallurgists-Flotation</h3>
         <p><strong>Job Description:</strong></p>
         <ul>
             <li>Oversee milling and flotation operations and supervise the respective operators.</li>

@@ -4,11 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Models\Equipment;
 use App\Models\Trip;
+use App\Models\Spare;
+use App\Models\EquipmentInsurance;
+use App\Models\EquipmentTax;
+use App\Models\MachineryUsage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Validation\ValidationException;
+
+use Barryvdh\DomPDF\Facade\Pdf;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use Carbon\Carbon;
+
 
 class EquipmentController extends Controller {
 
@@ -100,9 +113,8 @@ class EquipmentController extends Controller {
 
     public function show(Equipment $equipment) {
         try {
-            $equipment->load(['trips.fuels', 'trips.driver']);
-            $trips = $equipment->trips()->with('driver')->latest()->paginate(10);
-            return view('equipments.show', compact('equipment', 'trips'));
+            $equipment->load(['trips.driver', 'trips.fuels', 'spares', 'equipmentInsurances', 'equipmentTaxes']);
+            return view('equipments.show', compact('equipment'));
         } catch (\Exception $e) {
             \Log::error('Error showing equipment: ' . $e->getMessage());
             return redirect()->back()->with('error', 'An error occurred while fetching equipment details.');
@@ -317,7 +329,7 @@ class EquipmentController extends Controller {
         try {
             $lastTrip = Trip::where('equipment_id', $equipmentId)
                 ->orderBy('return_date', 'desc')
-                ->orderBy('id', 'desc') 
+                ->orderBy('id', 'desc')
                 ->first();
 
             $response = [
@@ -333,6 +345,297 @@ class EquipmentController extends Controller {
                 'end_kilometers' => null,
                 'error' => 'Failed to fetch last trip details',
             ], 500);
+        }
+    }
+
+    // -------------------Equipment Report Generation Methods -------------------------------
+    public function generate(Request $request) {
+        $request->validate([
+            'equipment_id' => 'required|exists:equipments,id',
+            'month' => 'required|numeric|min:1|max:12',
+            'year' => 'required|numeric|min:2000|max:' . date('Y'),
+            'format' => 'required|in:csv,pdf',
+        ]);
+
+        try {
+            $equipment = Equipment::with('trips.fuels')->findOrFail($request->equipment_id);
+
+            $month = $request->month;
+            $year = $request->year;
+            $format = $request->format;
+
+            $data = $equipment->trips()
+                ->whereMonth('departure_date', $month)
+                ->whereYear('departure_date', $year)
+                ->orderBy('departure_date', 'asc')
+                ->with('fuels') // Ensure fuels relationship is loaded
+                ->get();
+
+            if ($data->isEmpty()) {
+                return back()->with('error', 'No trip information found for the selected month and year.');
+            }
+
+            if ($format === 'pdf') {
+                return $this->generatePDF($data, $equipment, $month, $year);
+            } elseif ($format === 'csv') {
+                return $this->generateCSV($data, $equipment, $month, $year);
+            }
+
+            return back()->with('error', 'Invalid format selected.');
+        } catch (\Exception $e) {
+            \Log::error('Error generating report: ' . $e->getMessage());
+            return back()->with('error', 'An error occurred while generating the report: ' . $e->getMessage());
+        }
+    }
+
+    private function generatePDF($data, Equipment $equipment, $month, $year) {
+        $pdf = Pdf::loadView('reports.equipment_pdf', compact('data', 'equipment', 'month', 'year'));
+        return $pdf->download("equipment_report_{$equipment->registration_number}_{$month}_{$year}.pdf");
+    }
+
+    private function generateCSV($data, Equipment $equipment, $month, $year) {
+        try {
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Set the title
+            $title = "{$equipment->registration_number} - {$equipment->equipment_name} - {$equipment->type} - {$month}/{$year}";
+            $sheet->setCellValue('A1', $title);
+            $sheet->mergeCells('A1:K1');
+            $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+
+            // Add headers
+            $sheet->setCellValue('A2', '#')
+                ->setCellValue('B2', 'Departure Date')
+                ->setCellValue('C2', 'Return Date')
+                ->setCellValue('D2', 'Start Km')
+                ->setCellValue('E2', 'Close Km')
+                ->setCellValue('F2', 'Distance Travelled')
+                ->setCellValue('G2', 'Location')
+                ->setCellValue('H2', 'Material Delivered')
+                ->setCellValue('I2', 'Material Qty (tonnes)')
+                ->setCellValue('J2', 'Fuel Logs')
+                ->setCellValue('K2', 'Total Fuel Used (Litres)');
+
+            // Style headers
+            $headerStyle = [
+                'font' => ['bold' => true],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'D3D3D3']]
+            ];
+            $sheet->getStyle('A2:K2')->applyFromArray($headerStyle);
+
+            // Add data rows
+            $row = 3;
+            $totalFuelUsed = 0;
+            $totalDistanceTravelled = 0;
+            $totalMaterialDelivered = 0;
+
+            foreach ($data as $trip) {
+                $fuelLogs = $trip->fuels->map(function ($fuel) {
+                    return "{$fuel->litres_added}L at {$fuel->refuel_location}";
+                })->implode(' | ');
+
+                $departureDate = $trip->departure_date
+                    ? Carbon::parse($trip->departure_date)->format('Y/m/d')
+                    : '-';
+
+                $returnDate = $trip->return_date
+                    ? Carbon::parse($trip->return_date)->format('Y/m/d')
+                    : '-';
+
+                $distanceTravelled = ($trip->end_kilometers && $trip->start_kilometers) ? ($trip->end_kilometers - $trip->start_kilometers) : 0;
+                $materialDelivered = $trip->quantity ?? 0;
+
+                $sheet->setCellValue('A' . $row, $row - 2)
+                    ->setCellValue('B' . $row, $departureDate)
+                    ->setCellValue('C' . $row, $returnDate)
+                    ->setCellValue('D' . $row, $trip->start_kilometers)
+                    ->setCellValue('E' . $row, $trip->end_kilometers ?? 0)
+                    ->setCellValue('F' . $row, $distanceTravelled)
+                    ->setCellValue('G' . $row, $trip->location)
+                    ->setCellValue('H' . $row, $trip->material_delivered ?? '-')
+                    ->setCellValue('I' . $row, $materialDelivered)
+                    ->setCellValue('J' . $row, $fuelLogs ?: 'No fuel data')
+                    ->setCellValue('K' . $row, number_format($trip->fuels->sum('litres_added'), 2));
+
+                // Update totals
+                $totalFuelUsed += $trip->fuels->sum('litres_added');
+                $totalDistanceTravelled += $distanceTravelled;
+                $totalMaterialDelivered += $materialDelivered;
+
+                $row++;
+            }
+
+            // Summary section
+            $summaryRow = $row + 2;
+            $sheet->setCellValue('A' . $summaryRow, 'Summary')
+                ->setCellValue('F' . $summaryRow, 'Total Distance Travelled:')
+                ->setCellValue('G' . $summaryRow, number_format($totalDistanceTravelled, 2) . ' Km')
+                ->setCellValue('F' . ($summaryRow + 1), 'Total Fuel Used:')
+                ->setCellValue('G' . ($summaryRow + 1), number_format($totalFuelUsed, 2) . ' Litres')
+                ->setCellValue('F' . ($summaryRow + 2), 'Total Material Delivered:')
+                ->setCellValue('G' . ($summaryRow + 2), number_format($totalMaterialDelivered, 2) . ' Tonnes');
+
+            // Style summary section
+            $summaryStyle = [
+                'font' => ['bold' => true],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT],
+            ];
+            $sheet->getStyle('A' . $summaryRow . ':G' . ($summaryRow + 2))->applyFromArray($summaryStyle);
+
+            // Auto-size columns
+            foreach (range('A', 'K') as $column) {
+                $sheet->getColumnDimension($column)->setAutoSize(true);
+            }
+
+            // Save the file
+            $filename = "equipment_report_{$equipment->registration_number}_{$month}_{$year}.xlsx";
+            $filePath = storage_path("app/public/{$filename}");
+            $writer = new Xlsx($spreadsheet);
+            $writer->save($filePath);
+
+            return response()->download($filePath, $filename)->deleteFileAfterSend();
+        } catch (\Exception $e) {
+            \Log::error('CSV Generation Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to generate CSV file: ' . $e->getMessage())->withInput();
+        }
+    }
+
+
+    // ------------------Machinery Usage Methods --------------------------------
+    public function storeMachineryUsage(Request $request) {
+        try {
+            $validated = $request->validate([
+                'equipment_id' => 'required|exists:equipments,id',
+                'operator_id' => 'required|exists:employees,id',
+                'date' => 'required|date',
+                'start_hours' => 'required|numeric|min:0',
+                'closing_hours' => 'nullable|numeric|gt:start_hours',
+                'location' => 'required|string|max:255',
+                'fuels' => 'required|array|min:1',
+                'fuels.*.litres_added' => 'required|numeric|min:0',
+                'fuels.*.refuel_location' => 'nullable|string|max:255',
+            ]);
+
+            \DB::transaction(function () use ($validated) {
+                $usage = MachineryUsage::create([
+                    'equipment_id' => $validated['equipment_id'],
+                    'operator_id' => $validated['operator_id'],
+                    'date' => $validated['date'],
+                    'start_hours' => $validated['start_hours'],
+                    'closing_hours' => $validated['closing_hours'],
+                    'location' => $validated['location'],
+                ]);
+
+                foreach ($validated['fuels'] as $fuelData) {
+                    $usage->fuels()->create([
+                        'trip_id' => null,
+                        'machinery_usage_id' => $usage->id,
+                        'litres_added' => $fuelData['litres_added'],
+                        'refuel_location' => $fuelData['refuel_location'],
+                    ]);
+                }
+            });
+
+            return redirect()->route('equipments.show', $validated['equipment_id'])->with('success', 'Machinery usage and fuel records added successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()->withErrors($e->validator)->withInput();
+        } catch (\Exception $e) {
+            \Log::error('Error storing machinery usage: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to add machinery usage: ' . $e->getMessage());
+        }
+    }
+
+    public function lastMachineryUsage($equipment_id) {
+        $lastUsage = MachineryUsage::where('equipment_id', $equipment_id)
+            ->orderBy('date', 'desc')
+            ->first();
+
+        return response()->json([
+            'start_hours' => $lastUsage ? $lastUsage->start_hours : 0,
+            'closing_hours' => $lastUsage ? $lastUsage->closing_hours : null,
+        ]);
+    }
+
+    // ---------------------------Spares Methods-------------------------
+    public function createSpare(Equipment $equipment) {
+        return view('spares.create', compact('equipment'));
+    }
+
+    public function storeSpare(Request $request) {
+        try {
+            $validated = $request->validate([
+                'equipment_id' => 'required|exists:equipments,id',
+                'name' => 'required|string|max:255',
+                'quantity' => 'required|numeric|min:0',
+            ]);
+
+            Spare::create($validated);
+
+            return redirect()->route('equipments.show', $validated['equipment_id'])
+                             ->with('success', 'Spare part registered successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()->withErrors($e->validator)->withInput();
+        } catch (\Exception $e) {
+            \Log::error('Error storing spare: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to register spare part: ' . $e->getMessage())->withInput();
+        }
+    }
+
+    // ---------------------------Insurance Methods-------------------------
+    public function createInsurance(Equipment $equipment) {
+        return view('equipment-insurances.create', compact('equipment'));
+    }
+
+    public function storeInsurance(Request $request) {
+        try {
+            $validated = $request->validate([
+                'equipment_id' => 'required|exists:equipments,id',
+                'insurance_company' => 'required|string|max:255',
+                'phone_number' => 'nullable|string|max:255',
+                'address' => 'nullable|string|max:255',
+                'premium' => 'required|numeric|min:0',
+                'expiry_date' => 'required|date',
+            ]);
+
+            EquipmentInsurance::create($validated);
+
+            return redirect()->route('equipments.show', $validated['equipment_id'])
+                             ->with('success', 'Insurance registered successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()->withErrors($e->validator)->withInput();
+        } catch (\Exception $e) {
+            \Log::error('Error storing insurance: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to register insurance: ' . $e->getMessage())->withInput();
+        }
+    }
+
+    // ---------------------------Tax Methods------------------------
+    public function createTax(Equipment $equipment) {
+        return view('taxes.create', compact('equipment'));
+    }
+
+    public function storeTax(Request $request) {
+        try {
+            $validated = $request->validate([
+                'equipment_id' => 'required|exists:equipments,id',
+                'name' => 'required|string|max:255',
+                'cost' => 'required|numeric|min:0',
+                'expiry_date' => 'required|date',
+            ]);
+
+            EquipmentTax::create($validated);
+
+            return redirect()->route('equipments.show', $validated['equipment_id'])
+                             ->with('success', 'Tax registered successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()->withErrors($e->validator)->withInput();
+        } catch (\Exception $e) {
+            \Log::error('Error storing tax: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to register tax: ' . $e->getMessage())->withInput();
         }
     }
 }

@@ -6,14 +6,27 @@ use App\Models\Employee;
 use App\Models\Payslip;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Log;
+
 
 class EmployeeController extends Controller {
-    public function index() {
+    public function index(Request $request) {
         try {
-            $employees = Employee::all();
+            $query = Employee::orderBy('employee_full_name', 'asc');
+
+            if ($request->has('search') && !empty($request->input('search'))) {
+                $searchTerm = $request->input('search');
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('employee_full_name', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('employee_id', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('designation', 'like', '%' . $searchTerm . '%');
+                });
+            }
+
+            $employees = $query->get();
+
             return view('employees.index', compact('employees'));
         } catch (\Exception $e) {
-            // Log the error (optional, if you use Laravel's logging)
             \Log::error('Error fetching employees: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Failed to load employees. Please try again later.');
         }
@@ -31,22 +44,51 @@ class EmployeeController extends Controller {
     public function store(Request $request) {
         try {
             $validated = $request->validate([
-                'employee_full_name' => 'required|string|max:255',
+                // Personal Details
+                'first_name' => 'required|string|max:255',
+                'middle_name' => 'nullable|string|max:255',
+                'surname_name' => 'required|string|max:255',
+                'sex' => 'required|string|max:255',
                 'phone_number' => 'required|string|max:255',
                 'email' => 'nullable|email|max:255',
                 'address' => 'required|string|max:255',
+                'town' => 'required|string|max:255',
+                'marital_status' => 'required|string|max:255',
                 'nationality' => 'required|string|max:255',
+                'date_of_birth' => 'required|date|before:today',
+
+                // Employment Dates
                 'date_of_joining' => 'required|date',
-                'employee_id' => 'required|string|max:255|unique:employees',
+                'date_of_contract' => 'required|date',
+                'date_of_termination_of_contract' => 'required|date|after:date_of_contract',
+
+                // Identification Details
+                'employee_id' => 'required|string|max:255|unique:employees,employee_id',
+                'nhima_identification_number' => 'nullable|string|max:255',
                 'tpin_number' => 'nullable|string|max:255',
                 'nrc_or_passport_number' => 'required|string|max:255',
+
+                // Job Details
                 'designation' => 'required|string|max:255',
                 'department' => 'required|string|max:255',
+                'section' => 'required|string|max:255',
                 'grade' => 'nullable|string|max:255',
+                'status' => 'required|in:Active,Inactive,On Leave,Terminated',
+
+                // Salary Details
                 'basic_salary' => 'required|numeric|min:0',
                 'other_allowances' => 'nullable|numeric|min:0',
+
+                // References
+                'references' => 'nullable|array',
+                'references.*.name' => 'required_with:references|string|max:255',
+                'references.*.phone_number' => 'required_with:references|string|max:255',
+
+                // Payment Details
                 'payment_method' => 'required|string|max:255',
                 'social_security_number' => 'nullable|string|max:255',
+
+                // Bank Details
                 'account_name' => 'nullable|string|max:255',
                 'ifsc_code' => 'nullable|string|max:255',
                 'bank_name' => 'nullable|string|max:255',
@@ -54,19 +96,33 @@ class EmployeeController extends Controller {
                 'bank_address' => 'nullable|string|max:255',
                 'bank_telephone_number' => 'nullable|string|max:255',
                 'bank_account_number' => 'nullable|string|max:255',
-                'references' => 'nullable|array',
-                'references.*.name' => 'required_with:references|string|max:255',
-                'references.*.phone_number' => 'required_with:references|string|max:255',
             ]);
 
+            //convert some fields to uppercase
+            $validated['first_name'] = strtoupper($validated['first_name']);
+            $validated['middle_name'] = strtoupper($validated['middle_name'] ?? '');
+            $validated['surname_name'] = strtoupper($validated['surname_name']);
+            $validated['address'] = strtoupper($validated['address']);
+            $validated['town'] = strtoupper($validated['town']);
+            $validated['designation'] = strtoupper($validated['designation']);
+            $validated['department'] = strtoupper($validated['department']);
+            $validated['section'] = strtoupper($validated['section']);
+            $validated['payment_method'] = strtoupper($validated['payment_method'] ?? '');
+            $validated['bank_name'] = strtoupper($validated['bank_name'] ?? '');
+
+            $validated['employee_full_name'] = trim(
+                $validated['first_name'] . ' ' .
+                ($validated['middle_name'] ? $validated['middle_name'] . ' ' : '') .
+                $validated['surname_name']
+            );
+
+            // Calculate fixed allowances
             $validated['housing_allowance'] = $validated['basic_salary'] * 0.3; // 30% of basic salary
             $validated['transport_allowance'] = 200; // Fixed value
             $validated['food_allowance'] = 180; // Fixed value
 
-            // Create employee
             $employee = Employee::create($validated);
 
-            // Gross earnings calculation
             $grossEarnings = $employee->basic_salary
                 + $employee->housing_allowance
                 + $employee->transport_allowance
@@ -77,7 +133,7 @@ class EmployeeController extends Controller {
             $napsa = $grossEarnings * 0.05; // NAPSA contribution (5% of gross earnings)
             $nhima = $employee->basic_salary * 0.01; // NHIMA contribution (1% of basic salary)
 
-            //  ZRA tax
+            // ZRA tax calculation
             if ($grossEarnings > 9200) {
                 $zra = (5100 * 0) + (2000 * 0.2) + (2100 * 0.3) + (($grossEarnings - 9200) * 0.37);
             } elseif ($grossEarnings > 7100) {
@@ -88,8 +144,7 @@ class EmployeeController extends Controller {
                 $zra = 0;
             }
 
-            $totalDeductions = $zra + $nhima;
-
+            $totalDeductions = $zra + $nhima + $napsa;
             $netPay = $grossEarnings - $totalDeductions;
 
             // Create payslip
@@ -136,41 +191,94 @@ class EmployeeController extends Controller {
     public function update(Request $request, Employee $employee) {
         try {
             $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'id_number' => "required|string|max:255|unique:employees,id_number,{$employee->id}",
-                'position' => 'required|string|max:255',
-                'grade' => 'required|string|max:255',
-                'team' => 'nullable|string|max:255',
+                // Personal Details
+                'first_name' => 'required|string|max:255',
+                'middle_name' => 'nullable|string|max:255',
+                'surname_name' => 'required|string|max:255',
+                'sex' => 'required|string|max:255',
+                'phone_number' => 'required|string|max:255',
+                'email' => 'nullable|email|max:255',
+                'address' => 'required|string|max:255',
+                'town' => 'required|string|max:255',
+                'marital_status' => 'required|string|max:255',
+                'nationality' => 'required|string|max:255',
+                'date_of_birth' => 'required|date|before:today',
+
+                // Employment Dates
+                'date_of_joining' => 'required|date',
+                'date_of_contract' => 'required|date',
+                'date_of_termination_of_contract' => 'required|date|after:date_of_contract',
+
+                // Identification Details
+                'employee_id' => "required|string|max:255|unique:employees,employee_id,{$employee->id}",
+                'nhima_identification_number' => 'nullable|string|max:255',
+                'tpin_number' => 'nullable|string|max:255',
+                'nrc_or_passport_number' => 'required|string|max:255',
+
+                // Job Details
+                'designation' => 'required|string|max:255',
+                'department' => 'required|string|max:255',
+                'section' => 'required|string|max:255',
+                'grade' => 'nullable|string|max:255',
+                'status' => 'required|in:Active,Inactive,On Leave,Terminated',
+
+                // Salary Details
                 'basic_salary' => 'required|numeric|min:0',
-                'other_allowances' => 'required|numeric|min:0',
-                'overtime_hours' => 'nullable|numeric|min:0',
-                'overtime_pay' => 'nullable|numeric|min:0',
-                'loan_recovery' => 'required|numeric|min:0',
-                'other_deductions' => 'required|numeric|min:0',
-                'days_worked' => 'required|numeric|min:0',
+                'food_allowance' => 'required|numeric|min:0',
+                'housing_allowance' => 'required|numeric|min:0',
+                'transport_allowance' => 'required|numeric|min:0',
+                'other_allowances' => 'nullable|numeric|min:0',
+
+                // References
+                'references' => 'nullable|array',
+                'references.*.name' => 'nullable|string|max:255',
+                'references.*.phone_number' => 'nullable|string|max:255',
+
+                // Payment Details
                 'payment_method' => 'required|string|max:255',
-                'social_security_number' => 'required|string|max:255',
-                'bank_name' => 'nullable|string',
-                'branch_name' => 'nullable|string',
-                'bank_account_number' => 'nullable|string',
+                'social_security_number' => 'nullable|string|max:255',
+
+                // Bank Details
+                'account_name' => 'nullable|string|max:255',
+                'ifsc_code' => 'nullable|string|max:255',
+                'bank_name' => 'nullable|string|max:255',
+                'branch_name' => 'nullable|string|max:255',
+                'bank_address' => 'nullable|string|max:255',
+                'bank_telephone_number' => 'nullable|string|max:255',
+                'bank_account_number' => 'nullable|string|max:255',
             ]);
 
-            $validated['housing_allowance'] = $validated['basic_salary'] * 0.3; // 30% of basic salary
-            $validated['lunch_allowance'] = 180; // Fixed value
-            $validated['transport_allowance'] = 200; // Fixed value
+            //convert some fields to uppercase
+            $validated['first_name'] = strtoupper($validated['first_name']);
+            $validated['middle_name'] = strtoupper($validated['middle_name'] ?? '');
+            $validated['surname_name'] = strtoupper($validated['surname_name']);
+            $validated['nationality'] = strtoupper($validated['nationality']);
+            $validated['address'] = strtoupper($validated['address']);
+            $validated['town'] = strtoupper($validated['town']);
+            $validated['designation'] = strtoupper($validated['designation']);
+            $validated['department'] = strtoupper($validated['department']);
+            $validated['section'] = strtoupper($validated['section']);
+            $validated['bank_name'] = strtoupper($validated['bank_name'] ?? '');
+
+            $validated['employee_full_name'] = trim(
+                $validated['first_name'] . ' ' .
+                ($validated['middle_name'] ? $validated['middle_name'] . ' ' : '') .
+                $validated['surname_name']
+            );
 
             $employee->update($validated);
 
             $grossEarnings = $employee->basic_salary
-                + $validated['housing_allowance']
-                + $validated['transport_allowance']
-                + $validated['other_allowances']
-                + $validated['overtime_pay']
-                + $validated['lunch_allowance'];
+                + $employee->housing_allowance
+                + $employee->transport_allowance
+                + ($employee->other_allowances ?? 0)
+                + $employee->food_allowance;
 
-            $napsa = $grossEarnings * 0.05;
-            $nhima = $employee->basic_salary * 0.01;
+            // Deductions
+            $napsa = $grossEarnings * 0.05; // NAPSA contribution (5% of gross earnings)
+            $nhima = $employee->basic_salary * 0.01; // NHIMA contribution (1% of basic salary)
 
+            // ZRA tax calculation
             if ($grossEarnings > 9200) {
                 $zra = (5100 * 0) + (2000 * 0.2) + (2100 * 0.3) + (($grossEarnings - 9200) * 0.37);
             } elseif ($grossEarnings > 7100) {
@@ -181,15 +289,14 @@ class EmployeeController extends Controller {
                 $zra = 0;
             }
 
-            $totalDeductions = $employee->loan_recovery + $employee->other_deductions + $zra + $nhima;
+            $totalDeductions = $zra + $nhima + $napsa;
             $netPay = $grossEarnings - $totalDeductions;
 
+            // Update or create payslip
             $payslip = Payslip::where('employee_id', $employee->id)->first();
-
             if ($payslip) {
                 $payslip->update([
                     'gross_earnings' => $grossEarnings,
-                    'days_worked' => $validated['days_worked'],
                     'total_deductions' => $totalDeductions,
                     'net_pay' => $netPay,
                     'napsa_contribution' => $napsa,
@@ -200,7 +307,6 @@ class EmployeeController extends Controller {
                 Payslip::create([
                     'employee_id' => $employee->id,
                     'gross_earnings' => $grossEarnings,
-                    'days_worked' => $validated['days_worked'],
                     'total_deductions' => $totalDeductions,
                     'net_pay' => $netPay,
                     'napsa_contribution' => $napsa,
@@ -209,11 +315,12 @@ class EmployeeController extends Controller {
                 ]);
             }
 
-            return redirect()->route('employees.index')->with('success', 'Employee and payslip updated successfully.');
+            return redirect()->route('employees.show', $employee->id)->with('success', 'Employee Information updated successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()->withErrors($e->validator)->withInput();
         } catch (\Exception $e) {
             \Log::error('Error updating employee: ' . $e->getMessage());
-
-            return redirect()->back()->with('error', 'An error occurred while updating the employee. Please try again later.');
+            return redirect()->back()->with('error', 'Failed to update employee: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -223,59 +330,151 @@ class EmployeeController extends Controller {
         return redirect()->route('employees.index')->with('success', 'Employee deleted successfully.');
     }
 
-    public function generatePayslip($employeeId) {
-        $employee = Employee::findOrFail($employeeId);
+    public function generatePayslip(Request $request, $employeeId) {
+        try {
+            $employee = Employee::with('payslips')->findOrFail($employeeId);
 
-        $grossEarnings = $employee->basic_salary
-            + $employee->housing_allowance
-            + $employee->transport_allowance
-            + $employee->other_allowances
-            + $employee->overtime_pay
-            + $employee->lunch_allowance;
+            if ($request->isMethod('get')) {
+                $payslip = $employee->payslips->first();
+                if (!$payslip) {
+                    // Default payslip data if none exists, based on store logic + template fields
+                    $grossEarnings = $employee->basic_salary
+                        + $employee->housing_allowance
+                        + $employee->transport_allowance
+                        + $employee->food_allowance
+                        + ($employee->other_allowances ?? 0);
 
-        $napsa = $grossEarnings * 0.05;
-        $nhima = $employee->basic_salary * 0.01;
+                    $napsa = $grossEarnings * 0.05;
+                    $nhima = $employee->basic_salary * 0.01;
 
-        if ($grossEarnings > 9200) {
-            $zra = (5100 * 0) + (2000 * 0.2) + (2100 * 0.3) + (($grossEarnings - 9200) * 0.37);
-        } elseif ($grossEarnings > 7100) {
-            $zra = (5100 * 0) + (2000 * 0.2) + (($grossEarnings - 7100) * 0.3);
-        } elseif ($grossEarnings > 5100) {
-            $zra = (5100 * 0) + (($grossEarnings - 5100) * 0.2);
-        } else {
-            $zra = 0;
+                    if ($grossEarnings > 9200) {
+                        $zra = (5100 * 0) + (2000 * 0.2) + (2100 * 0.3) + (($grossEarnings - 9200) * 0.37);
+                    } elseif ($grossEarnings > 7100) {
+                        $zra = (5100 * 0) + (2000 * 0.2) + (($grossEarnings - 7100) * 0.3);
+                    } elseif ($grossEarnings > 5100) {
+                        $zra = (5100 * 0) + (($grossEarnings - 5100) * 0.2);
+                    } else {
+                        $zra = 0;
+                    }
+
+                    $totalDeductions = $zra + $nhima + $napsa;
+                    $netPay = $grossEarnings - $totalDeductions;
+
+                    $payslipData = [
+                        // DB-retrieved fields
+                        'basic_salary' => $employee->basic_salary,
+                        'housing_allowance' => $employee->housing_allowance,
+                        'transport_allowance' => $employee->transport_allowance,
+                        'lunch_allowance' => $employee->food_allowance, // Renamed to match template
+                        'other_allowances' => $employee->other_allowances ?? 0,
+                        'napsa' => $napsa,
+                        'nhima' => $nhima,
+                        'tax_rate' => $zra, // Renamed from tax_deduction to match template
+                        'total_earnings' => $grossEarnings,
+                        'total_deductions' => $totalDeductions,
+                        'net_pay' => $netPay,
+                        // Manual-entry fields (default values)
+                        'days_worked' => 26,
+                        'leave_days' => 0,
+                        'leave_value' => 0,
+                        'overtime_hours' => 0,
+                        'overtime_pay' => 0,
+                        'advance' => 0,
+                        'umuz_fee' => 0,
+                        'double_deducted' => 0,
+                        'tax_paid_ytd' => 0,
+                        'taxable_earnings_ytd' => 0,
+                        'annual_leave_due' => 0,
+                        'leave_value_ytd' => 0,
+                        'pay_period' => date('Y-m-d'),
+                        'prepared_by' => '',
+                    ];
+                } else {
+                    $payslipData = [
+                        // DB-retrieved fields
+                        'basic_salary' => $employee->basic_salary,
+                        'housing_allowance' => $employee->housing_allowance,
+                        'transport_allowance' => $employee->transport_allowance,
+                        'lunch_allowance' => $employee->food_allowance,
+                        'other_allowances' => $employee->other_allowances ?? 0,
+                        'napsa' => $payslip->napsa_contribution,
+                        'nhima' => $payslip->nhima,
+                        'tax_rate' => $payslip->tax_deduction,
+                        'total_earnings' => $payslip->gross_earnings,
+                        'total_deductions' => $payslip->total_deductions,
+                        'net_pay' => $payslip->net_pay,
+                        // Manual-entry fields (default values)
+                        'days_worked' => 26,
+                        'leave_days' => 0,
+                        'leave_value' => 0,
+                        'overtime_hours' => 0,
+                        'overtime_pay' => 0,
+                        'advance' => 0,
+                        'umuz_fee' => 0,
+                        'double_deducted' => 0,
+                        'tax_paid_ytd' => 0,
+                        'taxable_earnings_ytd' => 0,
+                        'annual_leave_due' => 0,
+                        'leave_value_ytd' => 0,
+                        'pay_period' => date('Y-m-d'),
+                    ];
+                }
+                return response()->json($payslipData);
+            }
+
+            if ($request->isMethod('post')) {
+                // Validate all fields from the template
+                $validated = $request->validate([
+                    'basic_salary' => 'required|numeric|min:0',
+                    'housing_allowance' => 'required|numeric|min:0',
+                    'transport_allowance' => 'required|numeric|min:0',
+                    'lunch_allowance' => 'required|numeric|min:0',
+                    'other_allowances' => 'nullable|numeric|min:0',
+                    'days_worked' => 'required|numeric|min:0',
+                    'leave_days' => 'required|numeric|min:0',
+                    'leave_value' => 'nullable|numeric|min:0',
+                    'overtime_hours' => 'required|numeric|min:0',
+                    'overtime_pay' => 'required|numeric|min:0',
+                    'total_earnings' => 'required|numeric|min:0',
+                    'tax_rate' => 'required|numeric|min:0',
+                    'napsa' => 'required|numeric|min:0',
+                    'nhima' => 'required|numeric|min:0',
+                    'advance' => 'required|numeric|min:0',
+                    'umuz_fee' => 'required|numeric|min:0',
+                    'double_deducted' => 'required|numeric|min:0',
+                    'total_deductions' => 'required|numeric|min:0',
+                    'net_pay' => 'required|numeric|min:0',
+                    'tax_paid_ytd' => 'required|numeric|min:0',
+                    'taxable_earnings_ytd' => 'required|numeric|min:0',
+                    'annual_leave_due' => 'required|numeric|min:0',
+                    'leave_value_ytd' => 'required|numeric|min:0',
+                    'pay_period' => 'required|date',
+                ]);
+
+                $payslipData = $validated;
+
+                $pdf = Pdf::loadView('payslips.template', compact('employee', 'payslipData'));
+                return $pdf->download("{$employee->employee_full_name}_payslip.pdf");
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Error in generatePayslip: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to process payslip: ' . $e->getMessage()], 500);
         }
+    }
 
-        $totalDeductions = $employee->loan_recovery + $employee->other_deductions + $zra + $nhima + $napsa;
-        $netPay = $grossEarnings - $totalDeductions;
+    public function printEmployeeInformation($employeeId){
+        try {
+            $employee = Employee::with('payslips')->findOrFail($employeeId);
 
-        $payslipData = [
-            'gross_pay_ytd' => Payslip::where('employee_id', $employee->id)->sum('gross_earnings'),
-            'tax_paid_ytd' => Payslip::where('employee_id', $employee->id)->sum('tax_deduction'),
-            'napsa_ytd' => Payslip::where('employee_id', $employee->id)->sum('napsa_contribution'),
-            'pension_ytd' => Payslip::where('employee_id', $employee->id)->sum('napsa_contribution'),
-            'basic_salary' => $employee->basic_salary,
-            'housing_allowance' => $employee->housing_allowance,
-            'health_insurance' => $nhima,
-            'napsa' => $napsa,
-            'transport_allowance' => $employee->transport_allowance,
-            'other_allowances' => $employee->other_allowances,
-            'overtime_pay' => $employee->overtime_pay,
-            'overtime_hours' => $employee->overtime_hours,
-            'lunch_allowance' => $employee->lunch_allowance,
-            'loan_recovery' => $employee->loan_recovery,
-            'other_deductions' => $employee->other_deductions,
-            'total_earnings' => $grossEarnings,
-            'total_deductions' => $totalDeductions,
-            'net_pay' => $netPay,
-            'payment_method' => $employee->payment_method,
-            'social_security_number' => $employee->social_security_number,
-            'bank_account_number' => $employee->bank_account_number,
-        ];
+            // Generate the PDF
+            $pdf = Pdf::loadView('reports.employee-information', compact('employee'));
+            return $pdf->download("{$employee->employee_full_name}_employee_information.pdf");
 
-        $pdf = Pdf::loadView('payslips.template',  compact('employee', 'payslipData'));
-
-        return $pdf->download("{$employee->name}_payslip.pdf");
+        } catch (\Exception $e) {
+            Log::error('Error generating employee information PDF: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to generate employee information PDF. Please try again.');
+        }
     }
 }
 

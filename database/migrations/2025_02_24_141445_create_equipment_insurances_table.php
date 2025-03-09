@@ -14,7 +14,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('equipment_id')->constrained('equipments')->onDelete('cascade');
             $table->string('insurance_company');
-            $table->decimal('cost', 10, 2);
+            $table->decimal('premium', 10, 2);
             $table->date('expiry_date');
             $table->timestamps();
         });

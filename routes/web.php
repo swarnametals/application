@@ -87,55 +87,42 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/employees/{employee}', [EmployeeController::class, 'update'])->name('employees.update');
     Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
 
-    Route::get('/employees/{employee}/payslip', [EmployeeController::class, 'generatePayslip'])->name('employees.generatePayslip');
+    // Route::get('/employees/{employee}/payslip', [EmployeeController::class, 'generatePayslip'])->name('employees.generatePayslip');
+    Route::match(['get', 'post'], '/employees/{employeeId}/generate-payslip', [EmployeeController::class, 'generatePayslip'])->name('employees.generatePayslip');
+    Route::get('/employees/{employee}/information', [EmployeeController::class, 'printEmployeeInformation'])->name('employees.print_employee_information');
 
-    // ----------------------------Vehicle and Fuel Management--------------------------------------------
     Route::post('/change-password', [UserController::class, 'changePassword'])->name('change-password');
 
-    // -----------------------Trip-related routes managed by EquipmentController---------------------------------------
+    // ---------------------------Equipment related routes -----------------------------
     Route::resource('equipments', EquipmentController::class);
+    Route::post('/reports/generate', [EquipmentController::class, 'generate'])->name('reports.generate');
 
+    // -----------------------Trip-related routes managed by EquipmentController---------------------------------------
     Route::get('/trips', [EquipmentController::class, 'indexTrips'])->name('trips.index');
     // Get the last trip's end kilometers for an equipment
     Route::get('/trips/last-trip/{equipmentId}', [EquipmentController::class, 'getLastTripEndKilometers']);
-
     Route::get('/trips/create/{equipment}', [EquipmentController::class, 'createTrip'])->name('trips.create');
-
     Route::post('/trips', [EquipmentController::class, 'storeTrip'])->name('trips.store');
-
     Route::get('/trips/{trip}', [EquipmentController::class, 'showTrip'])->name('trips.show');
-
     Route::get('/trips/{trip}/edit', [EquipmentController::class, 'editTrip'])->name('trips.edit');
-
     Route::put('/trips/{trip}', [EquipmentController::class, 'updateTrip'])->name('trips.update');
-
     Route::delete('/trips/{trip}', [EquipmentController::class, 'destroyTrip'])->name('trips.destroy');
 
-    Route::post('/fuels/store', [FuelLogController::class, 'store'])->name('fuels.store');
+    // Machinery Usage Routes
+    Route::post('/machinery-usages/store', [EquipmentController::class, 'storeMachineryUsage'])->name('machinery_usages.store');
+    Route::get('/machinery-usages/last-usage/{equipment_id}', [EquipmentController::class, 'lastMachineryUsage'])->name('machinery_usages.last');
 
-    Route::post('/fuel-logs/store', [FuelLogController::class, 'store'])->name('fuel_logs.store');
+    //Spares routes
+    Route::get('/equipment-spares/create/{equipment}', [EquipmentController::class, 'createSpare'])->name('equipment_spares.create');
+    Route::post('/equipment-spares/store', [EquipmentController::class, 'storeSpare'])->name('equipment_spares.store');
 
-    Route::get('/vehicle-logs', [VehicleLogController::class, 'index'])->name('vehicle_logs.index');
-    // get vehicle last log
-    Route::get('/vehicle-logs/last-trip/{vehicleId}', [VehicleLogController::class, 'getLastTripEndKilometers']);
+    // Insurance Routes
+    Route::get('/equipment-insurances/create/{equipment}', [EquipmentController::class, 'createInsurance'])->name('equipment_insurances.create');
+    Route::post('/equipment-insurances/store', [EquipmentController::class, 'storeInsurance'])->name('equipment_insurances.store');
 
-    Route::get('/vehicle-logs/create/{vehicle}', [VehicleLogController::class, 'create'])->name('vehicle_logs.create');
-
-    Route::post('/vehicle-logs', [VehicleLogController::class, 'store'])->name('vehicle_logs.store');
-
-    Route::get('/vehicle-logs/{vehicleLog}', [VehicleLogController::class, 'show'])->name('vehicle_logs.show');
-
-    Route::get('/vehicle-logs/{vehicleLog}/edit', [VehicleLogController::class, 'edit'])->name('vehicle_logs.edit');
-
-    Route::put('/vehicle-logs/{vehicleLog}', [VehicleLogController::class, 'update'])->name('vehicle_logs.update');
-
-    Route::delete('/vehicle-logs/{vehicleLog}', [VehicleLogController::class, 'destroy'])->name('vehicle_logs.destroy');
-
-    Route::get('/reports-type/{vehicle}', [VehicleController::class, 'reportType'])->name('reports.type');
-
-    Route::post('/reports/generate', [VehicleController::class, 'generate'])->name('reports.generate');
-
-    Route::post('/reports/generate-all', [VehicleController::class, 'generateAll'])->name('reports.generate_all');
+    // Tax Routes
+    Route::get('/equipment-taxes/create/{equipment}', [EquipmentController::class, 'createTax'])->name('equipment_taxes.create');
+    Route::post('/equipment-taxes/store', [EquipmentController::class, 'storeTax'])->name('equipment_taxes.store');
 
     Route::get('/not-implemented-yet', function () {
         return view('not-implemented-yet');

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Employee;
 use App\Models\Application;
-use App\Models\Vehicle;
+use App\Models\Equipment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -23,9 +23,9 @@ class UserController extends Controller {
     public function dashboard() {
         $employeesTotal = Employee::count();
         $applicationsTotal = Application::count();
-        $vehiclesTotal = Vehicle::count();
+        $equipmentsTotal = Equipment::count();
 
-        return view('dashboards.admin', compact('employeesTotal','applicationsTotal','vehiclesTotal'));
+        return view('dashboards.admin', compact('employeesTotal','applicationsTotal','equipmentsTotal'));
     }
 
     public function changePassword(Request $request) {

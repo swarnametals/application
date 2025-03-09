@@ -19,6 +19,7 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Font;
 
 
+
 class VehicleController extends Controller {
 
     public function index(Request $request) {

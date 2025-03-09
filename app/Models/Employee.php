@@ -16,17 +16,28 @@ class Employee extends Model
      */
     protected $fillable = [
         'user_id',
+        'first_name',
+        'middle_name',
+        'surname_name',
         'employee_full_name',
+        'sex',
         'phone_number',
         'email',
         'address',
+        'town',
+        'marital_status',
         'nationality',
+        'date_of_birth',
         'date_of_joining',
+        'date_of_contract',
+        'date_of_termination_of_contract',
         'employee_id',
+        'nhima_identification_number',
         'tpin_number',
         'nrc_or_passport_number',
         'designation',
         'department',
+        'section',
         'grade',
         'basic_salary',
         'housing_allowance',
@@ -43,6 +54,7 @@ class Employee extends Model
         'bank_address',
         'bank_telephone_number',
         'bank_account_number',
+        'status',
     ];
 
     /**
@@ -50,13 +62,18 @@ class Employee extends Model
      *
      * @var array
      */
+
     protected $casts = [
+        'date_of_birth' => 'date',
+        'date_of_joining' => 'date',
+        'date_of_contract' => 'date',
+        'date_of_termination_of_contract' => 'date',
         'basic_salary' => 'decimal:2',
         'housing_allowance' => 'decimal:2',
         'transport_allowance' => 'decimal:2',
         'other_allowances' => 'decimal:2',
         'food_allowance' => 'decimal:2',
-        'references' => 'array', // Cast JSON field to array
+        'references' => 'array',
     ];
 
     public function payslips()

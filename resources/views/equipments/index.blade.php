@@ -4,8 +4,7 @@
 
 @section('content')
 <div class="container">
-    <a href="{{ route('dashboards.admin') }}" class="btn btn-secondary mb-4"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
-    <h2 class="mb-4">Vehicles List</h2>
+    <h2 class="mb-4">Equipments List</h2>
 
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -23,13 +22,14 @@
         </div>
     @endif
 
-    <div class="d-flex justify-content-between mb-3">
-        <a href="{{ route('equipments.create') }}" class="btn" style="background-color:#510404; color: #fff;">
-            <i class="fas fa-truck"></i> Register Vehicle
+    <div class="d-flex  mb-3">
+        <a href="{{ route('dashboards.admin') }}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        <a href="{{ route('equipments.create') }}" class="btn" style="background-color:#510404; margin-left:6px; color: #fff;">
+            <i class="fas fa-truck"></i> Register Equipment
         </a>
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#reportModal">
+        {{-- <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#reportModal">
             <i class="fas fa-file-alt"></i> Generate Report For All Vehicles
-        </button>
+        </button> --}}
     </div>
 
     <!-- Search Form Later Update-->
@@ -49,12 +49,11 @@
 
     <!-- Dropdown to select vehicle -->
     <div class="mb-3">
-        <label for="vehicleSelect" class="form-label">Select a Vehicle to Register a Trip:</label>
-        <select id="vehicleSelect" class="form-select">
-            <option value="">Select a Vehicle to Register a Trip</option>
-            @foreach($equipments as $equipment)
-                <option value="{{ $equipment->id }}">
-                    {{ $equipment->registration_number ?? 'N/A' }} - {{ $equipment->equipment_name }}
+        <select class="form-control" id="vehicleSelect">
+            <option value="">Select an Equipement to Register a Trip/ Machinery Usage</option>
+            @foreach ($equipments as $equipment)
+                <option value="{{ $equipment->id }}" data-equipment-type="{{ $equipment->type }}">
+                    {{ $equipment->registration_number ?? $equipment->asset_code }} - {{ $equipment->type }}
                 </option>
             @endforeach
         </select>
@@ -69,9 +68,8 @@
                     <th>Registration Number</th>
                     <th>Equipment Name</th>
                     <th>Type</th>
-                    <th>Ownership</th>
                     <th>Value (USD)</th>
-                    <th>Mileage (Km)</th>
+                    <th>Mileage (Km) /Hours</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -83,23 +81,24 @@
                     <td>{{ $equipment->registration_number ?? 'N/A' }}</td>
                     <td>{{ $equipment->equipment_name }}</td>
                     <td>{{ $equipment->type }}</td>
-                    <td>{{ $equipment->ownership }}</td>
                     <td>{{ number_format($equipment->value, 2) }}</td>
                     <td>
                         @if($equipment->trips->last())
-                            {{ number_format($equipment->trips->last()->end_kilometers ?? $equipment->trips->last()->start_kilometers, 0, '.', ',') }}
+                            {{ number_format($equipment->trips->last()->end_kilometers ?? $equipment->trips->last()->start_kilometers, 0, '.', ',') }} Km
+                        @elseif ($equipment->machineryUsages->last())
+                            {{ number_format($equipment->machineryUsages->last()->closing_hours ?? $equipment->machineryUsages->last()->start_hours, 0, '.', ',') }} Hours
                         @else
-                            -
+                         -
                         @endif
                     </td>
                     <td>
-                        <a href="{{ route('equipments.show', $equipment) }}" class="btn btn-info btn-sm"><i class="fas fa-eye"></i> View</a>
+                        <a href="{{ route('equipments.show', $equipment) }}" class="btn btn-info btn-sm"><i class="fas fa-eye"></i> View Details</a>
                         <a href="{{ route('equipments.edit', $equipment) }}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</a>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="9" class="text-center">No vehicles found.</td>
+                    <td colspan="9" class="text-center">No Equipment found.</td>
                 </tr>
                 @endforelse
             </tbody>
@@ -121,7 +120,7 @@
             <div class="modal-body">
                 <div class="alert alert-warning mb-3">
                     <small>
-                        <strong>Note:</strong> If the driver is not listed in the dropdown below, please ensure they are registered as an employee with the designation "Driver" in the employee management section.
+                        <strong>Note:</strong> If the Driver/Operator is not listed in the dropdown below, please ensure they are registered as an employee with the designation "DRIVER" or "OPERATOR" in the employee management section.
                     </small>
                 </div>
                 <form action="{{ route('trips.store') }}" method="POST">
@@ -132,9 +131,20 @@
                             <label for="driver_id" class="form-label">Driver <span class="text-danger">*</span></label>
                             <select name="driver_id" id="driver_id" class="form-select @error('driver_id') is-invalid @enderror" required>
                                 <option value="">Select Driver</option>
-                                @foreach (\App\Models\Employee::where('designation', 'driver')->get() as $driver)
+                                @foreach (\App\Models\Employee::whereIn('designation', [
+                                    'DRIVER',
+                                    'OPERATOR',
+                                    'OPERATOR_LOADER',
+                                    'DRIVER _ HILUX',
+                                    'DRIVER_TIPPER',
+                                    'OPERATOR_EXCAVATOR',
+                                    'DRIVER_WATERBOWSER',
+                                    'OPERATOR_ROLLER',
+                                    'LOADER _ OPERATOR',
+                                    'DRIVER _ CONTAINER'
+                                ])->orderBy('employee_full_name', 'asc')->get() as $driver)
                                     <option value="{{ $driver->id }}" {{ old('driver_id') == $driver->id ? 'selected' : '' }}>
-                                        {{ $driver->employee_full_name }}
+                                        {{ $driver->employee_full_name }} ({{ $driver->designation }})
                                     </option>
                                 @endforeach
                             </select>
@@ -246,52 +256,119 @@
     </div>
 </div>
 
-<!-- Equipment Report Modal -->
-<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<!-- Modal for Machinery Usage Form -->
+<div class="modal fade" id="logMachineryUsageModal" tabindex="-1" aria-labelledby="logMachineryUsageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="reportModalLabel">Generate Report For All Vehicles</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header" style="background-color:#510404">
+                <h5 class="modal-title text-light" id="logMachineryUsageModalLabel">Register Machinery Usage</h5>
+                <button type="button" class="btn-close" style="color: #fff;" id="btn_close_machinery" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="{{ route('reports.generate_all') }}" method="POST">
+                <div class="alert alert-warning mb-3">
+                    <small>
+                        <strong>Note:</strong> If the Driver/Operator is not listed in the dropdown below, please ensure they are registered as an employee with the designation "DRIVER" or "OPERATOR" in the employee management section.
+                    </small>
+                </div>
+                <form action="{{ route('machinery_usages.store') }}" method="POST">
                     @csrf
-                    <input type="hidden" id="format" name="format" value="csv">
+                    <input type="hidden" name="equipment_id" id="selectedMachineryId">
 
-                    <div class="mb-3">
-                        <label for="month" class="form-label">Select Month</label>
-                        <select class="form-control @error('month') is-invalid @enderror" id="month" name="month" required>
-                            <option value="">Select Month</option>
-                            @for ($m = 1; $m <= 12; $m++)
-                                <option value="{{ $m }}" {{ old('month') == $m ? 'selected' : '' }}>
-                                    {{ date('F', mktime(0, 0, 0, $m, 1)) }}
-                                </option>
-                            @endfor
-                        </select>
-                        @error('month')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                    <div class="row mb-3">
+                        <div class="col-12 col-md-6">
+                            <label for="operator_id" class="form-label">Operator <span class="text-danger">*</span></label>
+                            <select name="operator_id" id="operator_id" class="form-select @error('operator_id') is-invalid @enderror" required>
+                                <option value="">Select Operator</option>
+                                @foreach (\App\Models\Employee::whereIn('designation', [
+                                    'DRIVER',
+                                    'OPERATOR',
+                                    'OPERATOR_LOADER',
+                                    'DRIVER _ HILUX',
+                                    'DRIVER_TIPPER',
+                                    'OPERATOR_EXCAVATOR',
+                                    'DRIVER_WATERBOWSER',
+                                    'OPERATOR_ROLLER',
+                                    'LOADER _ OPERATOR',
+                                    'DRIVER _ CONTAINER'
+                                ])->orderBy('employee_full_name', 'asc')->get() as $driver)
+                                    <option value="{{ $driver->id }}" {{ old('driver_id') == $driver->id ? 'selected' : '' }}>
+                                        {{ $driver->employee_full_name }} ({{ $driver->designation }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('operator_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="location" class="form-label">Location <span class="text-danger">*</span></label>
+                            <input type="text" name="location" class="form-control @error('location') is-invalid @enderror"
+                                   value="{{ old('location') }}" placeholder="example: Site,Kasempa,..." required>
+                            @error('location')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="year" class="form-label">Select Year</label>
-                        <select class="form-control @error('year') is-invalid @enderror" id="year" name="year" required>
-                            <option value="">Select Year</option>
-                            @for ($y = date('Y'); $y >= date('Y') - 10; $y--)
-                                <option value="{{ $y }}" {{ old('year') == $y ? 'selected' : '' }}>
-                                    {{ $y }}
-                                </option>
-                            @endfor
-                        </select>
-                        @error('year')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                    <div class="row mb-3">
+                        <div class="col-12 col-md-6">
+                            <label for="date" class="form-label">Date <span class="text-danger">*</span></label>
+                            <input type="date" name="date" class="form-control @error('date') is-invalid @enderror"
+                                   value="{{ old('date') }}" required>
+                            @error('date')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="start_hours" class="form-label">Start Hours <span class="text-danger">*</span></label>
+                            <input type="number"  name="start_hours" id="start_hours" class="form-control @error('start_hours') is-invalid @enderror"
+                                   value="{{ old('start_hours') }}" placeholder="example: 85670" required>
+                            @error('start_hours')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
+
+                    <div class="row mb-3">
+                        <div class="col-12 col-md-6">
+                            <label for="closing_hours" class="form-label">Closing Hours <span class="text-danger">*</span></label>
+                            <input type="number" name="closing_hours" class="form-control @error('closing_hours') is-invalid @enderror"
+                                   value="{{ old('closing_hours') }}" placeholder="example: 85690" required>
+                            @error('closing_hours')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <h4 class="mt-4">Fuel Information</h4>
+                    <div id="machinery-fuel-entries">
+                        <div class="fuel-entry row mb-3">
+                            <div class="col-12 col-md-5">
+                                <label for="litres_added[]" class="form-label">Litres Added <span class="text-danger">*</span></label>
+                                <input type="number" step="0.01" name="fuels[0][litres_added]" class="form-control @error('fuels.0.litres_added') is-invalid @enderror"
+                                       value="{{ old('fuels.0.litres_added') }}" placeholder="example: 230" required>
+                                @error('fuels.0.litres_added')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-12 col-md-5">
+                                <label for="refuel_location[]" class="form-label">Refuel Location</label>
+                                <input type="text" name="fuels[0][refuel_location]" class="form-control @error('fuels.0.refuel_location') is-invalid @enderror"
+                                       value="{{ old('fuels.0.refuel_location') }}" placeholder="example: Site">
+                                @error('fuels.0.refuel_location')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-12 col-md-2 d-flex align-items-end">
+                                <button type="button" class="btn btn-danger remove-fuel-entry" disabled><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary mb-3" id="add-machinery-fuel-entry"><i class="fas fa-plus"></i> Add Another Fuel Entry</button>
 
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-success"><i class="fas fa-download"></i> Generate Report</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cancel</button>
+                        <button type="button" class="btn btn-secondary" id="btn_close_machinery" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cancel</button>
+                        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save Machinery Usage & Fuel</button>
                     </div>
                 </form>
             </div>
@@ -303,43 +380,75 @@
     document.addEventListener("DOMContentLoaded", function() {
         var vehicleSelect = document.getElementById('vehicleSelect');
         var vehicleIdField = document.getElementById('selectedVehicleId');
-        var modalElement = document.getElementById('logTripModal');
+        var machineryIdField = document.getElementById('selectedMachineryId');
+        var tripModalElement = document.getElementById('logTripModal');
+        var machineryModalElement = document.getElementById('logMachineryUsageModal');
         var startKilometersField = document.getElementById('start_kilometers');
+        var startHoursField = document.getElementById('start_hours');
         var fuelEntriesContainer = document.getElementById('fuel-entries');
+        var machineryFuelEntriesContainer = document.getElementById('machinery-fuel-entries');
         var addFuelEntryButton = document.getElementById('add-fuel-entry');
+        var addMachineryFuelEntryButton = document.getElementById('add-machinery-fuel-entry');
         var fuelEntryCount = 1;
+        var machineryFuelEntryCount = 1;
 
-        if (vehicleSelect && vehicleIdField && modalElement && startKilometersField) {
+        if (vehicleSelect && vehicleIdField && machineryIdField && tripModalElement && machineryModalElement && startKilometersField) {
             vehicleSelect.addEventListener('change', function() {
                 if (this.value) {
-                    vehicleIdField.value = this.value;
+                    var selectedOption = this.options[this.selectedIndex];
+                    var equipmentType = selectedOption.getAttribute('data-equipment-type');
 
-                    // Fetch the last trip's end_kilometers for the selected equipment
-                    fetch(`/trips/last-trip/${this.value}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            startKilometersField.value = data.end_kilometers !== null ? data.end_kilometers : (data.start_kilometers || 0);
-                        })
-                        .catch(error => {
-                            console.error('Error fetching last trip details:', error);
-                            startKilometersField.value = 0; // Default to 0 on error
-                        });
+                    if (equipmentType === 'Machinery') {
+                        machineryIdField.value = this.value;
 
-                    // Show the modal
-                    var modal = new bootstrap.Modal(modalElement);
-                    modal.show();
+                        // Fetch the last Machinery Usage's closing_hours for the selected equipment
+                        fetch(`/machinery-usages/last-usage/${this.value}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                startHoursField.value = data.closing_hours !== null ? data.closing_hours : (data.start_hours || 0);
+                            })
+                            .catch(error => {
+                                console.error('Error fetching last trip details:', error);
+                                startHoursField.value = 0; // Default to 0 on error
+                            });
+                        var modal = new bootstrap.Modal(machineryModalElement);
+                        modal.show();
+                    } else {
+                        vehicleIdField.value = this.value;
+
+                        // Fetch the last trip's end_kilometers for the selected equipment
+                        fetch(`/trips/last-trip/${this.value}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                startKilometersField.value = data.end_kilometers !== null ? data.end_kilometers : (data.start_kilometers || 0);
+                            })
+                            .catch(error => {
+                                console.error('Error fetching last trip details:', error);
+                                startKilometersField.value = 0; // Default to 0 on error
+                            });
+
+                        var modal = new bootstrap.Modal(tripModalElement);
+                        modal.show();
+                    }
                 }
             });
 
             document.getElementById('btn_close').addEventListener('click', function () {
-                var modalInstance = bootstrap.Modal.getInstance(modalElement);
+                var modalInstance = bootstrap.Modal.getInstance(tripModalElement);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+            });
+
+            document.getElementById('btn_close_machinery').addEventListener('click', function () {
+                var modalInstance = bootstrap.Modal.getInstance(machineryModalElement);
                 if (modalInstance) {
                     modalInstance.hide();
                 }
             });
         }
 
-        // Add new fuel entry
+        // Add new fuel entry for trip modal
         addFuelEntryButton.addEventListener('click', function() {
             var newEntry = `
                 <div class="fuel-entry row mb-3">
@@ -358,20 +467,45 @@
             `;
             fuelEntriesContainer.insertAdjacentHTML('beforeend', newEntry);
             fuelEntryCount++;
-            updateRemoveButtons();
+            updateRemoveButtons(fuelEntriesContainer);
+        });
+
+        // Add new fuel entry for machinery modal
+        addMachineryFuelEntryButton.addEventListener('click', function() {
+            var newEntry = `
+                <div class="fuel-entry row mb-3">
+                    <div class="col-12 col-md-5">
+                        <label for="litres_added[]" class="form-label">Litres Added <span class="text-danger">*</span></label>
+                        <input type="number" step="0.01" name="fuels[${machineryFuelEntryCount}][litres_added]" class="form-control" placeholder="example: 60" required>
+                    </div>
+                    <div class="col-12 col-md-5">
+                        <label for="refuel_location[]" class="form-label">Refuel Location</label>
+                        <input type="text" name="fuels[${machineryFuelEntryCount}][refuel_location]" class="form-control" placeholder="example: Site, Solwezi, Kasempa">
+                    </div>
+                    <div class="col-12 col-md-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger remove-fuel-entry"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `;
+            machineryFuelEntriesContainer.insertAdjacentHTML('beforeend', newEntry);
+            machineryFuelEntryCount++;
+            updateRemoveButtons(machineryFuelEntriesContainer);
         });
 
         // Remove fuel entry
-        fuelEntriesContainer.addEventListener('click', function(e) {
+        function removeFuelEntry(e) {
             if (e.target.classList.contains('remove-fuel-entry') || e.target.parentElement.classList.contains('remove-fuel-entry')) {
                 e.target.closest('.fuel-entry').remove();
-                updateRemoveButtons();
+                updateRemoveButtons(e.target.closest('.fuel-entry').parentElement);
             }
-        });
+        }
 
-        function updateRemoveButtons() {
-            var entries = fuelEntriesContainer.getElementsByClassName('fuel-entry');
-            var removeButtons = fuelEntriesContainer.getElementsByClassName('remove-fuel-entry');
+        fuelEntriesContainer.addEventListener('click', removeFuelEntry);
+        machineryFuelEntriesContainer.addEventListener('click', removeFuelEntry);
+
+        function updateRemoveButtons(container) {
+            var entries = container.getElementsByClassName('fuel-entry');
+            var removeButtons = container.getElementsByClassName('remove-fuel-entry');
             for (var i = 0; i < removeButtons.length; i++) {
                 removeButtons[i].disabled = (entries.length === 1); // Disable if only one entry remains
             }

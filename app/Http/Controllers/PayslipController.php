@@ -23,24 +23,27 @@ class PayslipController extends Controller {
 
             Excel::import($import, $request->file('file'));
 
-            $failures = $import->getFailures();
+            $failures = $import->failures(); // Use failures() method for consistency
 
-            if (count($failures) > 0) {
+            if (!empty($failures)) {
                 foreach ($failures as $failure) {
-                    \Log::warning("Row {$failure->row()}: " . implode(', ', $failure->errors()));
+                    $rowNumber = $failure->row();
+                    $attribute = $failure->attribute(); // Single string, not an array
+                    $errors = implode(', ', $failure->errors()); // Errors is an array
+                    \Log::warning("Row {$rowNumber} failed: Attribute [{$attribute}] - {$errors}");
                 }
 
                 return redirect()->route('employees.index')
-                    ->with('warning', 'Some rows failed to process. Check logs for details.');
+                    ->with('warning', 'Some rows failed to process. Ensure dates are in M/D/YYYY format (e.g., 4/19/2025), all other field are correct in your excel sheet. Check logs for details.');
             }
 
             return redirect()->route('employees.index')
                 ->with('success', 'File uploaded and data processed successfully.');
         } catch (\Exception $e) {
-            \Log::error('Error during import: ' . $e->getMessage());
+            \Log::error('Error during employee import: ' . $e->getMessage() . ' - Stack Trace: ' . $e->getTraceAsString());
 
-            return redirect()->route('payslips.upload')
-                ->with('error', 'File processing failed. Please check the file and try again.');
+            return redirect()->route('employees.index')
+                ->with('error', 'File processing failed. Ensure dates are in M/D/YYYY format (e.g., 1/1/2025), all other field are correct in your excel sheet. and check logs for details.');
         }
     }
 

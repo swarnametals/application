@@ -25,8 +25,8 @@
                 <h5>Contact Details</h5>
                 <p><i class="fas fa-map-marker-alt"></i>Follow our Address, Sabina Mufulira Road</p>
                 <p>Kitwe - 50100, Copperbelt, Zambia</p>
-                {{-- <p><i class="fas fa-phone"></i> </p>
-                <p><i class="fas fa-envelope"></i> </p> --}}
+                <p><i class="fas fa-phone"></i> </p>
+                <p><i class="fas fa-envelope"></i> </p>
             </div>
             <div class="col-md-4 col-12">
                 <h5>Address</h5>
@@ -39,3 +39,4 @@
         </div>
     </div>
 </footer>
+

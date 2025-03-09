@@ -16,9 +16,9 @@ jobs:
           node-version: 16
       - uses: mirromutth/mysql-action@v1.1
         with:
-          mysql database: u265872520_swarnametals
-          mysql user: u265872520_swarna_user
-          mysql password: Sswarna@MQ5341
+          mysql database:
+          mysql user:
+          mysql password:
       - name: Copy .env
         run: cp .env.example .env
       - name: Install composer Dependencies
@@ -42,8 +42,3 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd domains
-            cd swarnametals.com
-            git pull
-            php composer.phar install
-            php artisan migrate --force

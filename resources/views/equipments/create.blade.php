@@ -63,13 +63,13 @@
                         <div class="mb-3">
                             <label for="equipment_name" class="form-label">Equipment Name <span class="text-danger">*</span></label>
                             <input type="text" name="equipment_name" class="form-control @error('equipment_name') is-invalid @enderror"
-                                value="{{ old('equipment_name') }}" placeholder="Enter Equipment Name" required>
+                                value="{{ old('equipment_name') }}" placeholder="Example: Tipper,Excavator,Hilux..." required>
                             @error('equipment_name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="mb-3">
-                            <label for="date_purchased" class="form-label">Date Purchased <span class="text-danger">*</span></label>
+                            <label for="date_purchased" class="form-label">Year Purchased <span class="text-danger">*</span></label>
                             <input type="date" name="date_purchased" class="form-control @error('date_purchased') is-invalid @enderror"
                                 value="{{ old('date_purchased') }}" required>
                             @error('date_purchased')

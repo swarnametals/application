@@ -11,12 +11,14 @@ class EquipmentInsurance extends Model {
     protected $fillable = [
         'equipment_id',
         'insurance_company',
-        'cost',
+        'phone_number',
+        'address',
+        'premium',
         'expiry_date',
     ];
 
     protected $casts = [
-        'cost' => 'decimal:2',
+        'premium' => 'decimal:2',
         'expiry_date' => 'date',
     ];
 
