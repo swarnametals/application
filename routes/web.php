@@ -81,7 +81,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
     Route::get('/employees/create', [EmployeeController::class, 'create'])->name('employees.create');
     Route::post('/employees', [EmployeeController::class, 'store'])->name('employees.store');
-    // Route::get('/employees/generate-payslips', [EmployeeController::class, 'generatePayslips'])->name('employees.generatePayslips');
     Route::get('/employees/{employee}', [EmployeeController::class, 'show'])->name('employees.show');
     Route::get('/employees/{employee}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
     Route::put('/employees/{employee}', [EmployeeController::class, 'update'])->name('employees.update');
@@ -94,6 +93,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/change-password', [UserController::class, 'changePassword'])->name('change-password');
 
     // ---------------------------Equipment related routes -----------------------------
+    Route::get('/equipments/upload', [EquipmentController::class, 'showUploadForm'])->name('equipments.uploadForm');
+    Route::post('/equipments/upload', [EquipmentController::class, 'upload'])->name('equipments.upload');
     Route::resource('equipments', EquipmentController::class);
     Route::post('/reports/generate', [EquipmentController::class, 'generate'])->name('reports.generate');
 

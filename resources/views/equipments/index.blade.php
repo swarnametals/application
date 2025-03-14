@@ -16,6 +16,12 @@
         </div>
     @endif
 
+    @if(session()->has('warning'))
+        <div class="alert alert-warning">
+            {{ session('warning') }}
+        </div>
+    @endif
+
     @if (session('error'))
         <div class="alert alert-danger">
             {{ session('error') }}
@@ -23,10 +29,10 @@
     @endif
 
     <div class="d-flex  mb-3">
-        <a href="{{ route('dashboards.admin') }}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
         <a href="{{ route('equipments.create') }}" class="btn" style="background-color:#510404; margin-left:6px; color: #fff;">
             <i class="fas fa-truck"></i> Register Equipment
         </a>
+        {{-- <a href="{{ route('equipments.upload') }}" class="btn btn-success"> <i class="fas fa-upload"></i> Add Equipments With An Excel Sheet</a> --}}
         {{-- <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#reportModal">
             <i class="fas fa-file-alt"></i> Generate Report For All Vehicles
         </button> --}}
@@ -53,7 +59,7 @@
             <option value="">Select an Equipement to Register a Trip/ Machinery Usage</option>
             @foreach ($equipments as $equipment)
                 <option value="{{ $equipment->id }}" data-equipment-type="{{ $equipment->type }}">
-                    {{ $equipment->registration_number ?? $equipment->asset_code }} - {{ $equipment->type }}
+                    {{ $equipment->registration_number ?? $equipment->asset_code }} - {{ $equipment->equipment_name }}
                 </option>
             @endforeach
         </select>
@@ -64,12 +70,13 @@
             <thead class="table-dark">
                 <tr>
                     <th>#</th>
-                    <th>Asset Code</th>
+                    {{-- <th>Asset Code</th> --}}
                     <th>Registration Number</th>
                     <th>Equipment Name</th>
                     <th>Type</th>
-                    <th>Value (USD)</th>
+                    {{-- <th>Value (USD)</th> --}}
                     <th>Mileage (Km) /Hours</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -77,11 +84,11 @@
                 @forelse($equipments as $equipment)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $equipment->asset_code ?? 'N/A' }}</td>
+                    {{-- <td>{{ $equipment->asset_code ?? 'N/A' }}</td> --}}
                     <td>{{ $equipment->registration_number ?? 'N/A' }}</td>
                     <td>{{ $equipment->equipment_name }}</td>
                     <td>{{ $equipment->type }}</td>
-                    <td>{{ number_format($equipment->value, 2) }}</td>
+                    {{-- <td>{{ number_format($equipment->value, 2) }}</td> --}}
                     <td>
                         @if($equipment->trips->last())
                             {{ number_format($equipment->trips->last()->end_kilometers ?? $equipment->trips->last()->start_kilometers, 0, '.', ',') }} Km
@@ -92,8 +99,27 @@
                         @endif
                     </td>
                     <td>
-                        <a href="{{ route('equipments.show', $equipment) }}" class="btn btn-info btn-sm"><i class="fas fa-eye"></i> View Details</a>
-                        <a href="{{ route('equipments.edit', $equipment) }}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</a>
+                        @if ($equipment->status == 'Running')
+                            <div class="btn btn-sm" style="background-color: #28a745; color: white; border-radius: 4px; padding: 0.25rem 0.5rem;">{{ $equipment->status }}</div>
+                        @elseif ($equipment->status == 'Under Maintenance')
+                            <div class="btn btn-sm" style="background-color: #6c757d; color: white; border-radius: 4px; padding: 0.25rem 0.5rem;">{{ $equipment->status }}</div>
+                        @elseif ($equipment->status == 'Broken Down')
+                            <div class="btn btn-sm" style="background-color: #ffc107; color: white; border-radius: 4px; padding: 0.25rem 0.5rem;">{{ $equipment->status }}</div>
+                        @elseif ($equipment->status == 'Accident')
+                            <div class="btn btn-sm" style="background-color: #dc3545; color: white; border-radius: 4px; padding: 0.25rem 0.5rem;">{{ $equipment->status }}</div>
+                        @else
+                            <div class="btn btn-sm" style="background-color: #6c757d; color: white; border-radius: 4px; padding: 0.25rem 0.5rem;">{{ $equipment->status ?? 'N/A' }}</div>
+                        @endif
+                    </td>
+                    <td class="text-nowrap">
+                        <div class="d-flex flex-column flex-md-row gap-1">
+                            <a href="{{ route('equipments.show', $equipment) }}" class="btn btn-info btn-sm mr-1">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                            <a href="{{ route('equipments.edit', $equipment) }}" class="btn btn-warning btn-sm mt-1">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 @empty
@@ -106,7 +132,6 @@
     </div>
 
     <!-- Pagination -->
-    {{ $equipments->links() }}
 </div>
 
 <!-- Modal for Equipment Trip Form -->
@@ -118,18 +143,13 @@
                 <button type="button" class="btn-close" style="color: #fff;" id="btn_close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="alert alert-warning mb-3">
-                    <small>
-                        <strong>Note:</strong> If the Driver/Operator is not listed in the dropdown below, please ensure they are registered as an employee with the designation "DRIVER" or "OPERATOR" in the employee management section.
-                    </small>
-                </div>
                 <form action="{{ route('trips.store') }}" method="POST">
                     @csrf
                     <input type="hidden" name="equipment_id" id="selectedVehicleId">
                     <div class="row mb-3">
                         <div class="col-12 col-md-6">
                             <label for="driver_id" class="form-label">Driver <span class="text-danger">*</span></label>
-                            <select name="driver_id" id="driver_id" class="form-select @error('driver_id') is-invalid @enderror" required>
+                            <select name="driver_id" id="driver_id" class="form-control @error('driver_id') is-invalid @enderror" required>
                                 <option value="">Select Driver</option>
                                 @foreach (\App\Models\Employee::whereIn('designation', [
                                     'DRIVER',

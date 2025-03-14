@@ -19,13 +19,14 @@ class Equipment extends Model {
     protected $fillable = [
         'asset_code',
         'registration_number',
-        'chasis_number',
+        'chassis_number',
         'engine_number',
         'type',
         'ownership',
         'equipment_name',
         'date_purchased',
         'value',
+        'status',
         'pictures',
     ];
 

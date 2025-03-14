@@ -34,9 +34,9 @@
                     <!-- Left Column: Mandatory Inputs -->
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="asset_code" class="form-label">Asset Code <span class="text-danger">*</span></label>
+                            <label for="asset_code" class="form-label">Asset Code</label>
                             <input type="text" name="asset_code" class="form-control @error('asset_code') is-invalid @enderror"
-                                value="{{ old('asset_code', $equipment->asset_code) }}" placeholder="Enter Asset Code" required>
+                                value="{{ old('asset_code', $equipment->asset_code) }}" placeholder="Enter Asset Code" >
                             @error('asset_code')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -77,6 +77,21 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+                        <div class="mb-3">
+                            <label for="status">Status <span class="text-danger">*</span></label>
+                            <select id="status" name="status" class="form-control @error('status') is-invalid @enderror" required>
+                                <option value="">Select Status</option>
+                                <option value="Running" {{ old('status', $equipment->status) == 'Running' ? 'selected' : '' }}>Running</option>
+                                <option value="Under Maintenance" {{ old('status', $equipment->status) == 'Under Maintenance' ? 'selected' : '' }}>Under Maintenance</option>
+                                <option value="Broken Down" {{ old('status', $equipment->status) == 'Broken Down' ? 'selected' : '' }}>Broken Down</option>
+                                <option value="Accident" {{ old('status', $equipment->status) == 'Accident' ? 'selected' : '' }}>Accident</option>
+                                <option value="Decommissioned" {{ old('status', $equipment->status) == 'Decommissioned' ? 'selected' : '' }}>Decommissioned</option>
+                                <option value="Reserved" {{ old('status', $equipment->status) == 'Reserved' ? 'selected' : '' }}>Reserved</option>
+                            </select>
+                            @error('status')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
 
                     <!-- Right Column: Optional Inputs -->
@@ -90,10 +105,10 @@
                             @enderror
                         </div>
                         <div class="mb-3">
-                            <label for="chasis_number" class="form-label">Chassis Number</label>
-                            <input type="text" name="chasis_number" class="form-control @error('chasis_number') is-invalid @enderror"
-                                value="{{ old('chasis_number', $equipment->chasis_number) }}" placeholder="Enter Chassis Number">
-                            @error('chasis_number')
+                            <label for="chassis_number" class="form-label">Chassis Number</label>
+                            <input type="text" name="chassis_number" class="form-control @error('chassis_number') is-invalid @enderror"
+                                value="{{ old('chassis_number', $equipment->chassis_number) }}" placeholder="Enter Chassis Number">
+                            @error('chassis_number')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -130,7 +145,7 @@
 
 
         <div class="d-flex justify-content-start mt-3">
-            <button type="submit" class="btn btn-success me-2"><i class="fas fa-save"></i> Update</button>
+            <button type="submit" class="btn btn-success mr-2"><i class="fas fa-save"></i> Update</button>
             <a href="{{ route('equipments.index') }}" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</a>
         </div>
     </form>

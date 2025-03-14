@@ -3,7 +3,7 @@
 @section('title', 'Employees')
 
 @section('content')
-<div class="container mt-5">
+<div class="container">
     @if(session('error'))
         <div class="alert alert-danger">
             {{ session('error') }}
@@ -17,9 +17,9 @@
     @endif
 
     <div class="d-flex flex-wrap gap-2 mb-3">
-        <a href="{{ route('dashboards.admin') }}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        {{-- <a href="{{ route('dashboards.admin') }}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Dashboard</a> --}}
         <a href="{{ route('employees.create') }}" class="btn btn-success" style="background-color:#510404; margin-left:6px; color: #fff;"><i class="fas fa-user-plus"></i> Add New Employee</a>
-        <a href="{{ route('payslips.upload') }}" class="btn btn-success"> <i class="fas fa-upload"></i> Add Employees With An Excel Sheet</a>
+        {{-- <a href="{{ route('payslips.upload') }}" class="btn btn-success"> <i class="fas fa-upload"></i> Add Employees With An Excel Sheet</a> --}}
     </div>
 
     <form action="{{ route('employees.index') }}" method="GET" class="mb-3">
@@ -48,7 +48,6 @@
                     <th>Employee ID</th>
                     <th>Designation</th>
                     <th>Department</th>
-                    <th>Phone Number</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -61,7 +60,6 @@
                     <td>{{ $employee->employee_id }}</td>
                     <td>{{ $employee->designation }}</td>
                     <td>{{ $employee->department }}</td>
-                    <td>{{ $employee->phone_number }}</td>
                     <td>
                         @if ($employee->status == 'Active')
                             <div class="btn btn-sm" style="background-color: #28a745; color: white; border-radius: 4px; padding: 0.25rem 0.5rem;">{{ $employee->status }}</div>
@@ -76,17 +74,15 @@
                         @endif
                     </td>
                     <td>
-                        <div class="d-flex gap-2">
-                            <a href="{{ route('employees.show', $employee->id) }}" class="btn btn-info btn-sm"><i class="fas fa-eye"></i>
-                                View Details
-                            </a>
-                            <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i>
-                                Edit
-                            </a>
-                            {{-- <a href="{{ route('employees.generatePayslip', $employee->id) }}" class="btn btn-primary btn-sm"><i class="fas fa-print"></i>
-                                Print Payslip
-                            </a> --}}
-                        </div>
+                        <a href="{{ route('employees.show', $employee->id) }}" class="btn btn-info btn-sm"><i class="fas fa-eye"></i>
+                            View Details
+                        </a>
+                        <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-warning btn-sm mt-2"><i class="fas fa-edit"></i>
+                            Edit
+                        </a>
+                        {{-- <a href="{{ route('employees.generatePayslip', $employee->id) }}" class="btn btn-primary btn-sm"><i class="fas fa-print"></i>
+                            Print Payslip
+                        </a> --}}
                     </td>
                 </tr>
             @endforeach

@@ -33,10 +33,8 @@
 
     <!-- Action Buttons -->
     <div class="d-flex flex-column flex-md-row gap-2 mb-4">
-        <a href="{{ route('equipments.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Equipments
-        </a>
-        <button type="button" class="btn add-trip-btn" style="background-color:#510404; color: #fff;" data-equipment-id="{{ $equipment->id }}" data-equipment-type="{{ $equipment->type }}">
+        <a href="{{ route('equipments.edit', $equipment) }}" class="btn btn-warning mr-2"><i class="fas fa-edit"></i> Edit</a>
+        <button type="button" class="btn add-trip-btn mr-2" style="background-color:#510404; color: #fff;" data-equipment-id="{{ $equipment->id }}" data-equipment-type="{{ $equipment->type }}">
             <i class="fas fa-plus-circle"></i> Add Trip
         </button>
         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#reportModal">
@@ -53,13 +51,13 @@
             <button class="nav-link" id="trips-tab" data-bs-toggle="tab" data-bs-target="#trips" type="button" role="tab" aria-controls="trips" aria-selected="false">Trips /Hours</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="spares-tab" data-bs-toggle="tab" data-bs-target="#spares" type="button" role="tab" aria-controls="spares" aria-selected="false">Spares</button>
-        </li>
-        <li class="nav-item" role="presentation">
             <button class="nav-link" id="insurances-tab" data-bs-toggle="tab" data-bs-target="#insurances" type="button" role="tab" aria-controls="insurances" aria-selected="false">Insurances</button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="taxes-tab" data-bs-toggle="tab" data-bs-target="#taxes" type="button" role="tab" aria-controls="taxes" aria-selected="false">Taxes</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="spares-tab" data-bs-toggle="tab" data-bs-target="#spares" type="button" role="tab" aria-controls="spares" aria-selected="false">Spares</button>
         </li>
     </ul>
 
@@ -75,8 +73,21 @@
                         <div class="col-md-6">
                             <p><strong>Asset Code:</strong> {{ $equipment->asset_code ?? 'N/A' }}</p>
                             <p><strong>Registration Number:</strong> {{ $equipment->registration_number ?? 'N/A' }}</p>
-                            <p><strong>Chassis Number:</strong> {{ $equipment->chasis_number ?? 'N/A' }}</p>
+                            <p><strong>Chassis Number:</strong> {{ $equipment->chassis_number ?? 'N/A' }}</p>
                             <p><strong>Engine Number:</strong> {{ $equipment->engine_number ?? 'N/A' }}</p>
+                            <p>
+                                @if ($equipment->status == 'Running')
+                                    <div class="btn btn-sm" style="background-color: #28a745; color: white; border-radius: 4px; padding: 0.25rem 0.5rem;">{{ $equipment->status }}</div>
+                                @elseif ($equipment->status == 'Under Maintenance')
+                                    <div class="btn btn-sm" style="background-color: #6c757d; color: white; border-radius: 4px; padding: 0.25rem 0.5rem;">{{ $equipment->status }}</div>
+                                @elseif ($equipment->status == 'Broken Down')
+                                    <div class="btn btn-sm" style="background-color: #ffc107; color: white; border-radius: 4px; padding: 0.25rem 0.5rem;">{{ $equipment->status }}</div>
+                                @elseif ($equipment->status == 'Accident')
+                                    <div class="btn btn-sm" style="background-color: #dc3545; color: white; border-radius: 4px; padding: 0.25rem 0.5rem;">{{ $equipment->status }}</div>
+                                @else
+                                    <div class="btn btn-sm" style="background-color: #6c757d; color: white; border-radius: 4px; padding: 0.25rem 0.5rem;">{{ $equipment->status ?? 'N/A' }}</div>
+                                @endif
+                            </p>
                         </div>
                         <div class="col-md-6">
                             <p ><strong>Type:</strong> {{ $equipment->type }}</p>
@@ -358,7 +369,7 @@
                                     @foreach ($equipment->equipmentInsurances as $insurance)
                                         <tr>
                                             <td>{{ $insurance->insurance_company }}</td>
-                                            <td>{{ number_format($insurance->premium, 2) }}</td>
+                                            <td>{{ $insurance->premium > 0 ? number_format($insurance->premium, 2) : '-' }}</td>
                                             <td>{{ $insurance->phone_number ?? 'N/A' }}</td>
                                             <td>{{ $insurance->address ?? 'N/A' }}</td>
                                             <td>{{ $insurance->expiry_date->format('Y-m-d') }}</td>
@@ -398,7 +409,7 @@
                                     @foreach ($equipment->equipmentTaxes as $tax)
                                         <tr>
                                             <td>{{ $tax->name }}</td>
-                                            <td>{{ number_format($tax->cost, 2) }}</td>
+                                            <td>{{ $tax->cost > 0 ? number_format($tax->cost, 2) : '-' }}</td>
                                             <td>{{ $tax->expiry_date->format('Y-m-d') }}</td>
                                         </tr>
                                     @endforeach
@@ -432,7 +443,7 @@
                         <div class="row mb-3">
                             <div class="col-12 col-md-6">
                                 <label for="add_driver_id" class="form-label">Driver <span class="text-danger">*</span></label>
-                                <select name="driver_id" id="add_driver_id" class="form-select @error('driver_id') is-invalid @enderror" required>
+                                <select name="driver_id" id="add_driver_id" class="form-control @error('driver_id') is-invalid @enderror" required>
                                     <option value="">Select Driver</option>
                                     @foreach (\App\Models\Employee::whereIn('designation', [
                                         'DRIVER',
@@ -592,7 +603,7 @@
                         <div class="row mb-3">
                             <div class="col-12 col-md-6">
                                 <label for="operator_id" class="form-label">Operator <span class="text-danger">*</span></label>
-                                <select name="operator_id" id="operator_id" class="form-select @error('operator_id') is-invalid @enderror" required>
+                                <select name="operator_id" id="operator_id" class="form-control @error('operator_id') is-invalid @enderror" required>
                                     <option value="">Select Operator</option>
                                     @foreach (\App\Models\Employee::whereIn('designation', [
                                         'DRIVER',

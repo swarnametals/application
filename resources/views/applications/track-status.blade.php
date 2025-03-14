@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('website-layouts.app')
 
 @section('title', 'Track Application Status')
 

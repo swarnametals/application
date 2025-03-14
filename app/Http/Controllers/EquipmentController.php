@@ -9,6 +9,7 @@ use App\Models\EquipmentInsurance;
 use App\Models\EquipmentTax;
 use App\Models\MachineryUsage;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Exception;
@@ -27,7 +28,7 @@ class EquipmentController extends Controller {
 
     public function index() {
         try {
-            $equipments = Equipment::with('trips')->latest()->paginate(10);
+            $equipments = Equipment::with('trips')->get();
             return view('equipments.index', compact('equipments'));
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Failed to fetch equipment.');
@@ -67,8 +68,8 @@ class EquipmentController extends Controller {
         try {
             $request->validate([
                 'asset_code' => 'nullable|string|max:255|unique:equipments,asset_code',
-                'registration_number' => 'nullable|string|max:255|unique:equipments,registration_number',
-                'chasis_number' => 'nullable|string|max:255|unique:equipments,chasis_number',
+                'registration_number' => 'nullable|string|max:255',
+                'chassis_number' => 'nullable|string|max:255|unique:equipments,chasis_number',
                 'engine_number' => 'nullable|string|max:255|unique:equipments,engine_number',
                 'type' => 'required|in:HMV,LMV,Machinery',
                 'ownership' => 'required|string|max:255',
@@ -92,13 +93,14 @@ class EquipmentController extends Controller {
             $equipment = Equipment::create([
                 'asset_code' => $request->asset_code,
                 'registration_number' => $request->registration_number,
-                'chasis_number' => $request->chasis_number,
+                'chassis_number' => $request->chassis_number,
                 'engine_number' => $request->engine_number,
                 'type' => $request->type,
                 'ownership' => $request->ownership,
                 'equipment_name' => $request->equipment_name,
                 'date_purchased' => $request->date_purchased,
                 'value' => $request->value,
+                'status' => $request->status,
                 'pictures' => json_encode($pictures), // Store file paths as JSON
             ]);
 
@@ -133,8 +135,8 @@ class EquipmentController extends Controller {
         try {
             $request->validate([
                 'asset_code' => 'nullable|string|max:255|unique:equipments,asset_code,' . $equipment->id,
-                'registration_number' => 'nullable|string|max:255|unique:equipments,registration_number,' . $equipment->id,
-                'chasis_number' => 'nullable|string|max:255|unique:equipments,chasis_number,' . $equipment->id,
+                'registration_number' => 'nullable|string|max:255',
+                'chassis_number' => 'nullable|string|max:255|unique:equipments,chassis_number,' . $equipment->id,
                 'engine_number' => 'nullable|string|max:255|unique:equipments,engine_number,' . $equipment->id,
                 'type' => 'required|in:HMV,LMV,Machinery',
                 'ownership' => 'required|string|max:255',
@@ -158,17 +160,18 @@ class EquipmentController extends Controller {
             $equipment->update([
                 'asset_code' => $request->asset_code,
                 'registration_number' => $request->registration_number,
-                'chasis_number' => $request->chasis_number,
+                'chassis_number' => $request->chassis_number,
                 'engine_number' => $request->engine_number,
                 'type' => $request->type,
                 'ownership' => $request->ownership,
                 'equipment_name' => $request->equipment_name,
                 'date_purchased' => $request->date_purchased,
                 'value' => $request->value,
+                'status' => $request->status,
                 'pictures' => json_encode($pictures), // Update with new picture paths
             ]);
 
-            return redirect()->route('equipments.index')->with('success', 'Equipment ' . ($equipment->registration_number ?? $equipment->asset_code ?? 'unknown') . ' updated successfully.');
+            return redirect()->route('equipments.index')->with('success', 'Equipment ' . ($equipment->registration_number ?? $equipment->asset_code ?? '') . ' updated successfully.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return redirect()->back()->withErrors($e->validator)->withInput();
         } catch (\Exception $e) {
@@ -183,6 +186,45 @@ class EquipmentController extends Controller {
             // return redirect()->route('equipment.index')->with('success', 'Equipment deleted successfully.');
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Failed to delete equipment.');
+        }
+    }
+
+    //----------------------Bulk Equipment Upload with excel----------------------
+    public function showUploadForm() {
+        return view('equipments.upload');
+    }
+
+    public function upload(Request $request) {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,csv',
+        ]);
+
+        try {
+            $import = new \App\Imports\EquipmentImport();
+
+            Excel::import($import, $request->file('file'));
+
+            $failures = $import->failures(); // Use failures() method for consistency
+
+            if (!empty($failures)) {
+                foreach ($failures as $failure) {
+                    $rowNumber = $failure->row();
+                    $attribute = $failure->attribute(); // Single string, not an array
+                    $errors = implode(', ', $failure->errors()); // Errors is an array
+                    \Log::warning("Row {$rowNumber} failed: Attribute [{$attribute}] - {$errors}");
+                }
+
+                return redirect()->route('equipments.index')
+                    ->with('warning', 'Some rows failed to process. Ensure dates are in D/M/YYYY format (e.g., 19/4/2025), all other field are correct in your excel sheet. Check logs for details.');
+            }
+
+            return redirect()->route('equipments.index')
+                ->with('success', 'File uploaded and data processed successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Error during employee import: ' . $e->getMessage() . ' - Stack Trace: ' . $e->getTraceAsString());
+
+            return redirect()->route('equipments.index')
+                ->with('error', 'File processing failed. Ensure dates are in D/M/YYYY format (e.g., 1/1/2025), all other field are correct in your excel sheet. and check logs for details.');
         }
     }
 
@@ -393,6 +435,117 @@ class EquipmentController extends Controller {
         return $pdf->download("equipment_report_{$equipment->registration_number}_{$month}_{$year}.pdf");
     }
 
+    // private function generateCSV($data, Equipment $equipment, $month, $year) {
+    //     try {
+    //         $spreadsheet = new Spreadsheet();
+    //         $sheet = $spreadsheet->getActiveSheet();
+
+    //         // Set the title
+    //         $title = "{$equipment->registration_number} - {$equipment->equipment_name} - {$equipment->type} - {$month}/{$year}";
+    //         $sheet->setCellValue('A1', $title);
+    //         $sheet->mergeCells('A1:K1');
+    //         $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+    //         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+
+    //         // Add headers
+    //         $sheet->setCellValue('A2', '#')
+    //             ->setCellValue('B2', 'Departure Date')
+    //             ->setCellValue('C2', 'Return Date')
+    //             ->setCellValue('D2', 'Start Km')
+    //             ->setCellValue('E2', 'Close Km')
+    //             ->setCellValue('F2', 'Distance Travelled')
+    //             ->setCellValue('G2', 'Location')
+    //             ->setCellValue('H2', 'Material Delivered')
+    //             ->setCellValue('I2', 'Material Qty (tonnes)')
+    //             ->setCellValue('J2', 'Fuel Logs')
+    //             ->setCellValue('K2', 'Total Fuel Used (Litres)');
+
+    //         // Style headers
+    //         $headerStyle = [
+    //             'font' => ['bold' => true],
+    //             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+    //             'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+    //             'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'D3D3D3']]
+    //         ];
+    //         $sheet->getStyle('A2:K2')->applyFromArray($headerStyle);
+
+    //         // Add data rows
+    //         $row = 3;
+    //         $totalFuelUsed = 0;
+    //         $totalDistanceTravelled = 0;
+    //         $totalMaterialDelivered = 0;
+
+    //         foreach ($data as $trip) {
+    //             $fuelLogs = $trip->fuels->map(function ($fuel) {
+    //                 return "{$fuel->litres_added}L at {$fuel->refuel_location}";
+    //             })->implode(' | ');
+
+    //             $departureDate = $trip->departure_date
+    //                 ? Carbon::parse($trip->departure_date)->format('Y/m/d')
+    //                 : '-';
+
+    //             $returnDate = $trip->return_date
+    //                 ? Carbon::parse($trip->return_date)->format('Y/m/d')
+    //                 : '-';
+
+    //             $distanceTravelled = ($trip->end_kilometers && $trip->start_kilometers) ? ($trip->end_kilometers - $trip->start_kilometers) : 0;
+    //             $materialDelivered = $trip->quantity ?? 0;
+
+    //             $sheet->setCellValue('A' . $row, $row - 2)
+    //                 ->setCellValue('B' . $row, $departureDate)
+    //                 ->setCellValue('C' . $row, $returnDate)
+    //                 ->setCellValue('D' . $row, $trip->start_kilometers)
+    //                 ->setCellValue('E' . $row, $trip->end_kilometers ?? 0)
+    //                 ->setCellValue('F' . $row, $distanceTravelled)
+    //                 ->setCellValue('G' . $row, $trip->location)
+    //                 ->setCellValue('H' . $row, $trip->material_delivered ?? '-')
+    //                 ->setCellValue('I' . $row, $materialDelivered)
+    //                 ->setCellValue('J' . $row, $fuelLogs ?: 'No fuel data')
+    //                 ->setCellValue('K' . $row, number_format($trip->fuels->sum('litres_added'), 2));
+
+    //             // Update totals
+    //             $totalFuelUsed += $trip->fuels->sum('litres_added');
+    //             $totalDistanceTravelled += $distanceTravelled;
+    //             $totalMaterialDelivered += $materialDelivered;
+
+    //             $row++;
+    //         }
+
+    //         // Summary section
+    //         $summaryRow = $row + 2;
+    //         $sheet->setCellValue('A' . $summaryRow, 'Summary')
+    //             ->setCellValue('F' . $summaryRow, 'Total Distance Travelled:')
+    //             ->setCellValue('G' . $summaryRow, number_format($totalDistanceTravelled, 2) . ' Km')
+    //             ->setCellValue('F' . ($summaryRow + 1), 'Total Fuel Used:')
+    //             ->setCellValue('G' . ($summaryRow + 1), number_format($totalFuelUsed, 2) . ' Litres')
+    //             ->setCellValue('F' . ($summaryRow + 2), 'Total Material Delivered:')
+    //             ->setCellValue('G' . ($summaryRow + 2), number_format($totalMaterialDelivered, 2) . ' Tonnes');
+
+    //         // Style summary section
+    //         $summaryStyle = [
+    //             'font' => ['bold' => true],
+    //             'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT],
+    //         ];
+    //         $sheet->getStyle('A' . $summaryRow . ':G' . ($summaryRow + 2))->applyFromArray($summaryStyle);
+
+    //         // Auto-size columns
+    //         foreach (range('A', 'K') as $column) {
+    //             $sheet->getColumnDimension($column)->setAutoSize(true);
+    //         }
+
+    //         // Save the file
+    //         $filename = "equipment_report_{$equipment->registration_number}_{$month}_{$year}.xlsx";
+    //         $filePath = storage_path("app/public/{$filename}");
+    //         $writer = new Xlsx($spreadsheet);
+    //         $writer->save($filePath);
+
+    //         return response()->download($filePath, $filename)->deleteFileAfterSend();
+    //     } catch (\Exception $e) {
+    //         \Log::error('CSV Generation Error: ' . $e->getMessage());
+    //         return redirect()->back()->with('error', 'Failed to generate CSV file: ' . $e->getMessage())->withInput();
+    //     }
+    // }
+
     private function generateCSV($data, Equipment $equipment, $month, $year) {
         try {
             $spreadsheet = new Spreadsheet();
@@ -405,7 +558,7 @@ class EquipmentController extends Controller {
             $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
 
-            // Add headers
+            // Add headers for trips
             $sheet->setCellValue('A2', '#')
                 ->setCellValue('B2', 'Departure Date')
                 ->setCellValue('C2', 'Return Date')
@@ -418,7 +571,7 @@ class EquipmentController extends Controller {
                 ->setCellValue('J2', 'Fuel Logs')
                 ->setCellValue('K2', 'Total Fuel Used (Litres)');
 
-            // Style headers
+            // Style headers for trips
             $headerStyle = [
                 'font' => ['bold' => true],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
@@ -427,7 +580,7 @@ class EquipmentController extends Controller {
             ];
             $sheet->getStyle('A2:K2')->applyFromArray($headerStyle);
 
-            // Add data rows
+            // Add data rows for trips
             $row = 3;
             $totalFuelUsed = 0;
             $totalDistanceTravelled = 0;
@@ -438,14 +591,8 @@ class EquipmentController extends Controller {
                     return "{$fuel->litres_added}L at {$fuel->refuel_location}";
                 })->implode(' | ');
 
-                $departureDate = $trip->departure_date
-                    ? Carbon::parse($trip->departure_date)->format('Y/m/d')
-                    : '-';
-
-                $returnDate = $trip->return_date
-                    ? Carbon::parse($trip->return_date)->format('Y/m/d')
-                    : '-';
-
+                $departureDate = $trip->departure_date ? Carbon::parse($trip->departure_date)->format('Y/m/d') : '-';
+                $returnDate = $trip->return_date ? Carbon::parse($trip->return_date)->format('Y/m/d') : '-';
                 $distanceTravelled = ($trip->end_kilometers && $trip->start_kilometers) ? ($trip->end_kilometers - $trip->start_kilometers) : 0;
                 $materialDelivered = $trip->quantity ?? 0;
 
@@ -469,22 +616,85 @@ class EquipmentController extends Controller {
                 $row++;
             }
 
+            // Add a separator row
+            $row++;
+            $sheet->setCellValue('A' . $row, 'Associated Costs');
+            $sheet->mergeCells('A' . $row . ':K' . $row);
+            $sheet->getStyle('A' . $row)->getFont()->setBold(true)->setSize(12);
+            $sheet->getStyle('A' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+            // Add headers for associated costs
+            $row++;
+            $sheet->setCellValue('A' . $row, 'Type')
+                ->setCellValue('B' . $row, 'Details')
+                ->setCellValue('C' . $row, 'Amount (ZMK)')
+                ->setCellValue('D' . $row, 'Expiry Date');
+
+            // Style headers for associated costs
+            $sheet->getStyle('A' . $row . ':D' . $row)->applyFromArray($headerStyle);
+
+            // Add data rows for insurances
+            $row++;
+            foreach ($equipment->equipmentInsurances as $insurance) {
+                $sheet->setCellValue('A' . $row, 'Insurance')
+                    ->setCellValue('B' . $row, $insurance->insurance_company)
+                    ->setCellValue('C' . $row, ($insurance->premium > 0) ? number_format($insurance->premium, 2) : '-')
+                    ->setCellValue('D' . $row, $insurance->expiry_date->format('Y/m/d'));
+                $row++;
+            }
+
+            // Add data rows for taxes
+            foreach ($equipment->equipmentTaxes as $tax) {
+                $sheet->setCellValue('A' . $row, 'Tax')
+                    ->setCellValue('B' . $row, $tax->name)
+                    ->setCellValue('C' . $row, ($tax->cost > 0) ? number_format($tax->cost, 2) : '-')
+                    ->setCellValue('D' . $row, $tax->expiry_date->format('Y/m/d'));
+                $row++;
+            }
+
+            // Add data rows for spares
+            foreach ($equipment->spares as $spare) {
+                $sheet->setCellValue('A' . $row, 'Spares')
+                    ->setCellValue('B' . $row, $spare->name)
+                    ->setCellValue('C' . $row, ($spare->price > 0) ? number_format($spare->price, 2) : '-' )
+                    ->setCellValue('D' . $row, '-');
+                $row++;
+            }
+
+            // Add a separator row before the summary
+            $row++;
+            $sheet->setCellValue('A' . $row, 'Summary');
+            $sheet->mergeCells('A' . $row . ':K' . $row);
+            $sheet->getStyle('A' . $row)->getFont()->setBold(true)->setSize(12);
+            $sheet->getStyle('A' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+            // Fetch related costs
+            $totalInsuranceCost = $equipment->equipmentInsurances()->sum('premium');
+            $totalTaxCost = $equipment->equipmentTaxes()->sum('cost');
+            $totalSpareCost = $equipment->spares()->sum('price'); // Adjust if needed for actual cost
+
             // Summary section
-            $summaryRow = $row + 2;
+            $summaryRow = $row + 1;
             $sheet->setCellValue('A' . $summaryRow, 'Summary')
                 ->setCellValue('F' . $summaryRow, 'Total Distance Travelled:')
                 ->setCellValue('G' . $summaryRow, number_format($totalDistanceTravelled, 2) . ' Km')
                 ->setCellValue('F' . ($summaryRow + 1), 'Total Fuel Used:')
                 ->setCellValue('G' . ($summaryRow + 1), number_format($totalFuelUsed, 2) . ' Litres')
                 ->setCellValue('F' . ($summaryRow + 2), 'Total Material Delivered:')
-                ->setCellValue('G' . ($summaryRow + 2), number_format($totalMaterialDelivered, 2) . ' Tonnes');
+                ->setCellValue('G' . ($summaryRow + 2), number_format($totalMaterialDelivered, 2) . ' Tonnes')
+                ->setCellValue('F' . ($summaryRow + 3), 'Total Insurance Cost:')
+                ->setCellValue('G' . ($summaryRow + 3), ($totalInsuranceCost > 0) ? number_format($totalInsuranceCost, 2). ' ZMK' : '- ZMK')
+                ->setCellValue('F' . ($summaryRow + 4), 'Total Tax Cost:')
+                ->setCellValue('G' . ($summaryRow + 4), ($totalTaxCost > 0) ? number_format($totalTaxCost, 2) . ' ZMK' : '- ZMK')
+                ->setCellValue('F' . ($summaryRow + 5), 'Total Spare Cost:')
+                ->setCellValue('G' . ($summaryRow + 5), ($totalSpareCost > 0) ? number_format($totalSpareCost, 2) . ' ZMK' : '- ZMK');
 
             // Style summary section
             $summaryStyle = [
                 'font' => ['bold' => true],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT],
             ];
-            $sheet->getStyle('A' . $summaryRow . ':G' . ($summaryRow + 2))->applyFromArray($summaryStyle);
+            $sheet->getStyle('A' . $summaryRow . ':G' . ($summaryRow + 5))->applyFromArray($summaryStyle);
 
             // Auto-size columns
             foreach (range('A', 'K') as $column) {
@@ -503,7 +713,6 @@ class EquipmentController extends Controller {
             return redirect()->back()->with('error', 'Failed to generate CSV file: ' . $e->getMessage())->withInput();
         }
     }
-
 
     // ------------------Machinery Usage Methods --------------------------------
     public function storeMachineryUsage(Request $request) {

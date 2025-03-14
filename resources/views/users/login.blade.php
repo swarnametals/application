@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('website-layouts.app')
 
 @section('title', 'Login')
 
@@ -20,7 +20,7 @@
                                 </ul>
                             </div>
                         @endif
-                        
+
                         <!-- Login Form -->
                         <form method="POST" action="{{ route('login') }}">
                             @csrf

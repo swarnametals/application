@@ -29,10 +29,7 @@
         {{-- <a href="{{ route('employees.generatePayslip', $employee->id) }}" class="btn btn-primary">
             <i class="fas fa-print"></i> Print Payslip
         </a> --}}
-        <a href="{{ route('employees.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Employees
-        </a>
-        <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-warning btn-sm">
+        <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-warning btn-sm mr-2">
             <i class="fas fa-edit"></i> Edit
         </a>
         <a href="{{ route('employees.print_employee_information', $employee->id) }}" class="btn btn-success">

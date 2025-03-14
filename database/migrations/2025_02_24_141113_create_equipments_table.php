@@ -13,8 +13,8 @@ return new class extends Migration
         Schema::create('equipments', function (Blueprint $table) {
             $table->id();
             $table->string('asset_code')->nullable();
-            $table->string('registration_number')->unique()->nullable();
-            $table->string('chasis_number')->unique()->nullable(); 
+            $table->string('registration_number')->nullable();
+            $table->string('chassis_number')->unique()->nullable();
             $table->string('engine_number')->unique()->nullable();
             $table->string('type');
             $table->string('ownership');

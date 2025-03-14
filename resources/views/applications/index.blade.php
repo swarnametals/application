@@ -4,8 +4,6 @@
 
 @section('content')
 <div class="container mt-5">
-    <a href="{{ route('dashboards.admin') }}" class="btn btn-secondary mb-4">Back to Dashboard</a>
-
     <h2 class="mb-4">Applications</h2>
 
     <!-- Filter Form -->

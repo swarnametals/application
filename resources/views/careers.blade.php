@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('website-layouts.app')
 
 @section('title', 'Careers')
 
@@ -97,6 +97,7 @@
             <tr><td>10</td><td>HR Assistant Officer</td></tr>
             <tr><td>11</td><td>Safety Officer</td></tr>
             <tr><td>12</td><td>Chemist</td></tr>
+            <tr><td>13</td><td>Accounts Assistant</td></tr>
         </tbody>
     </table>
 
@@ -323,6 +324,30 @@
         <p>To submit your application, please <a href="{{ route('applications.create') }}">click here</a>.</p>
     </div>
 
+    <div>
+        <h3>13. Accounts Assistant</h3>
+        <p><strong>Job Description:</strong></p>
+        <ul>
+            <li>Prepare and process NHIMA, VAT Returns, NAPSA, PAYE, and other statutory payments to ensure compliance.</li>
+            <li>Assist in the preparation of monthly, quarterly, and annual financial statements and reports.</li>
+            <li>Reconcile bank statements, supplier accounts, and other financial records for accuracy.</li>
+            <li>Ensure compliance with company accounting policies and financial regulations.</li>
+            <li>Assist in payroll processing and ensure correct statutory deductions.</li>
+            <li>Provide administrative support to the finance team and assist with accounting tasks.</li>
+        </ul>
+        <p><strong>Qualifications Required:</strong></p>
+        <ul>
+            <li>Diploma or Bachelor's degree in Accounting, Finance,CIMA 2, ACCA 2 or a related field.</li>
+            <li>3-5 years of experience in an accounting or finance role.</li>
+            <li>Proficiency in NHIMA, VAT Returns, NAPSA, PAYE, and other statutory regulations.</li>
+            <li>Strong knowledge of financial reporting, reconciliations, and bookkeeping.</li>
+            <li>Ability to work independently and meet tight deadlines.</li>
+            <li>Proficiency in Microsoft Office Suite (Excel, Word, PowerPoint).</li>
+        </ul>
+        <p>To submit your application, please <a href="{{ route('applications.create') }}">click here</a>.</p>
+    </div>
+
+
     <h3>General Requirements for All Positions</h3>
     <ul>
         <li>Proven experience in a relevant field.</li>
@@ -346,7 +371,7 @@
         <li>To submit your application, please <a href="{{ route('applications.create') }}">click here</a>.</li>
     </ul>
 
-    <p><strong>Application Deadline:</strong> 31st March 2025</p>
+    <p><strong>Application Deadline:</strong> 17st April 2025</p>
     <p><strong>Why Join Us?</strong> Be part of a dynamic team driving innovation in Zambia’s copper industry. Join us in our journey towards excellence!</p>
 
 </div>
